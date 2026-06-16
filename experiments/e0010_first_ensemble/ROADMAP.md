@@ -1,0 +1,67 @@
+# Roadmap — e0010_first_ensemble
+
+Ordered, incremental plan to implement the experiment described in
+[`RATIONALE.md`](./RATIONALE.md). Each phase should leave the experiment in a
+runnable, committable state. All code is Python, managed with uv.
+
+## Phase 0 — Environment setup (uv)
+
+- [ ] `uv init --python 3.12` in this directory to create `pyproject.toml` and pin
+      the Python version.
+- [ ] `uv add pandas numpy` (core), `uv add --dev pytest ruff` (tooling).
+- [ ] Confirm `.venv/` is gitignored and that `pyproject.toml` + `uv.lock` are
+      committed.
+- [ ] Add a `uv run ruff check` / `uv run pytest` sanity check.
+
+## Phase 1 — Data access layer
+
+- [ ] Implement a loader that reads gzipped CSV bars from `../../data/bars/`,
+      resolving the path relative to the repo root (no absolute paths).
+- [ ] Parse the format correctly: `;` separator, `Time (EET)` timestamps
+      (`%Y.%m.%d %H:%M:%S`), columns `Open/High/Low/Close/Volume`.
+- [ ] Provide helpers to select instrument(s) + year range and to resample
+      1-minute bars to a coarser timeframe (e.g. 1h / 1d).
+- [ ] Treat data strictly as read-only; cache any derived frames under `outputs/`.
+
+## Phase 2 — Backtest harness
+
+- [ ] Define a minimal strategy interface (input: bars → output: target
+      position / signal in [-1, 1]).
+- [ ] Implement a vectorized backtester: signal → positions → returns → equity.
+- [ ] Model transaction costs (spread/slippage/fees) and position sizing.
+- [ ] Compute core metrics: total/annualized return, Sharpe, max drawdown,
+      hit rate, turnover.
+
+## Phase 3 — Base strategies
+
+- [ ] Trend/momentum (e.g. moving-average crossover).
+- [ ] Mean-reversion (e.g. RSI or rolling z-score).
+- [ ] Breakout (e.g. Donchian channel).
+- [ ] Backtest each independently and record per-strategy metrics as the baseline
+      to beat.
+
+## Phase 4 — Ensemble
+
+- [ ] Combine base signals: majority vote, averaged signal, and inverse-volatility
+      weighting.
+- [ ] Measure correlation between base strategy return streams.
+- [ ] Backtest each ensemble variant; compare against individual strategies.
+
+## Phase 5 — Validation
+
+- [ ] Out-of-sample / walk-forward split (train window → test window).
+- [ ] Run across the selected instruments to check robustness (not one market).
+- [ ] Basic sensitivity check on key parameters to gauge overfitting.
+
+## Phase 6 — Reporting & conclusion
+
+- [ ] Generate equity-curve and metrics plots into `outputs/`.
+- [ ] Evaluate against the success criteria in `RATIONALE.md`.
+- [ ] Write the conclusion (edge found / not found / inconclusive) and next steps
+      in this experiment's `README.md`.
+
+## Out of scope (for this experiment)
+
+- Learned meta-models / ML-based ensembling.
+- Live or paper trading and broker integration.
+- Sharing code with other experiments (copy into a new experiment instead).
