@@ -6,22 +6,25 @@ runnable, committable state. All code is Python, managed with uv.
 
 ## Phase 0 — Environment setup (uv)
 
-- [ ] `uv init --python 3.12` in this directory to create `pyproject.toml` and pin
+- [x] `uv init --python 3.12` in this directory to create `pyproject.toml` and pin
       the Python version.
-- [ ] `uv add pandas numpy` (core), `uv add --dev pytest ruff` (tooling).
-- [ ] Confirm `.venv/` is gitignored and that `pyproject.toml` + `uv.lock` are
+- [x] `uv add pandas numpy` (core), `uv add --dev pytest ruff` (tooling).
+- [x] Confirm `.venv/` is gitignored and that `pyproject.toml` + `uv.lock` are
       committed.
-- [ ] Add a `uv run ruff check` / `uv run pytest` sanity check.
+- [x] Add a `uv run ruff check` / `uv run pytest` sanity check.
 
 ## Phase 1 — Data access layer
 
-- [ ] Implement a loader that reads gzipped CSV bars from `../../data/bars/`,
-      resolving the path relative to the repo root (no absolute paths).
-- [ ] Parse the format correctly: `;` separator, `Time (EET)` timestamps
+- [x] Implement a loader that reads gzipped CSV bars from `../../data/bars/`,
+      resolving the path relative to the repo root (no absolute paths). →
+      `data.load_bars()` in `data.py`.
+- [x] Parse the format correctly: `;` separator, `Time (EET)` timestamps
       (`%Y.%m.%d %H:%M:%S`), columns `Open/High/Low/Close/Volume`.
-- [ ] Provide helpers to select instrument(s) + year range and to resample
-      1-minute bars to a coarser timeframe (e.g. 1h / 1d).
-- [ ] Treat data strictly as read-only; cache any derived frames under `outputs/`.
+- [x] Provide helpers to select instrument(s) + year range and to resample
+      1-minute bars to a coarser timeframe (e.g. 1h / 1d). →
+      `available_years()`, `load_bars(years=/start_year=/end_year=)`, `resample()`.
+- [x] Treat data strictly as read-only (loader never writes into `data/`).
+      Caching derived frames under `outputs/` deferred until a consumer needs it.
 
 ## Phase 2 — Backtest harness
 
