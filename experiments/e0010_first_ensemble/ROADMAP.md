@@ -51,10 +51,12 @@ runnable, committable state. All code is Python, managed with uv.
 
 ## Phase 4 — Ensemble
 
-- [ ] Combine base signals: majority vote, averaged signal, and inverse-volatility
-      weighting.
-- [ ] Measure correlation between base strategy return streams.
-- [ ] Backtest each ensemble variant; compare against individual strategies.
+- [x] Combine base signals: majority vote, averaged signal, and inverse-volatility
+      weighting. → `ensemble.py`.
+- [x] Measure correlation between base strategy return streams.
+      → `return_correlation_matrix()`.
+- [x] Backtest each ensemble variant; compare against individual strategies.
+      → `ensemble_run.py` (`uv run python ensemble_run.py`).
 
 ## Phase 5 — Validation
 
