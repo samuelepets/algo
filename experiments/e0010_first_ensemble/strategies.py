@@ -152,3 +152,22 @@ ALL_STRATEGIES: list[ConnorsRsi2 | EmaCrossRsi | RsiCenterlineEma] = [
     EmaCrossRsi(),
     RsiCenterlineEma(),
 ]
+
+STRATEGY_KEYS: dict[str, type[ConnorsRsi2] | type[EmaCrossRsi] | type[RsiCenterlineEma]] = {
+    "S1_connors_rsi2": ConnorsRsi2,
+    "S2_ema_cross_rsi": EmaCrossRsi,
+    "S3_rsi_centerline_ema": RsiCenterlineEma,
+}
+
+
+def strategy_from_key(
+    key: str,
+    params: dict[str, int | float] | None = None,
+) -> ConnorsRsi2 | EmaCrossRsi | RsiCenterlineEma:
+    """Instantiate a strategy by registry key, optionally overriding parameters."""
+    cls = STRATEGY_KEYS[key]
+    return cls(**params) if params else cls()
+
+
+def default_strategy(key: str) -> ConnorsRsi2 | EmaCrossRsi | RsiCenterlineEma:
+    return strategy_from_key(key)

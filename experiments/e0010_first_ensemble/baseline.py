@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 import backtest
 import data
-from strategies import ALL_STRATEGIES
+from optimize import load_all_optimized
+from strategies import ALL_STRATEGIES, STRATEGY_KEYS, strategy_from_key
 
 
 def main() -> None:
@@ -19,14 +21,36 @@ def main() -> None:
         default=0.00002,
         help="Transaction cost per unit position change (e.g. 0.00002 ≈ 0.2 bp).",
     )
+    parser.add_argument(
+        "--optimized",
+        action="store_true",
+        help="Use GA-optimized parameters from outputs/optimized_*.json.",
+    )
+    parser.add_argument(
+        "--outputs-dir",
+        type=Path,
+        default=Path("outputs"),
+        help="Directory containing optimized_*.json files.",
+    )
     args = parser.parse_args()
 
     bars = data.load_bars("EURUSD", start_year=args.start_year, end_year=args.end_year)
     print(f"EUR/USD bars: {len(bars):,} ({args.start_year}–{args.end_year})")
     print(f"cost_per_turnover={args.cost_per_turnover}")
+    if args.optimized:
+        print(f"mode=optimized (from {args.outputs_dir})")
     print()
 
-    for strategy in ALL_STRATEGIES:
+    if args.optimized:
+        records = load_all_optimized(args.outputs_dir)
+        missing = sorted(set(STRATEGY_KEYS) - set(records))
+        if missing:
+            raise SystemExit(f"Missing optimized records for: {', '.join(missing)}")
+        strategies = [strategy_from_key(key, records[key].parameters) for key in sorted(STRATEGY_KEYS)]
+    else:
+        strategies = ALL_STRATEGIES
+
+    for strategy in strategies:
         signal = strategy.generate_signal(bars)
         result = backtest.backtest(bars, signal, cost_per_turnover=args.cost_per_turnover)
         m = result.metrics
