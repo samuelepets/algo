@@ -37,10 +37,12 @@ on top of this dataset.
         └── <SYMBOL>/<SYMBOL>_<YEAR>.csv.gz
 ```
 
-> Note: `data/` is ~445 MB and is **not tracked by git** (only `LICENSE` and
-> `README.md` are committed). Treat it as a local, read-only data source. If you
-> add code that generates artifacts, do not commit large data files; add a
-> `.gitignore` entry instead.
+> Note: `data/` (~445 MB) **is tracked by git** and committed to the repository
+> as the canonical dataset. Files are pre-gzipped and each is well under
+> GitHub's 100 MB per-file limit (largest ≈ 8 MB), so plain git is used (no LFS).
+> Treat the corpus as **read-only input**: do not modify, rewrite, or delete
+> these files. Do not commit *generated* artifacts (backtest outputs, caches,
+> etc.) — add a `.gitignore` entry for those instead.
 
 ## Market data
 
@@ -107,7 +109,8 @@ There is no established stack yet, so when introducing one:
   (`requirements.txt` or `pyproject.toml`).
 - Keep the data layer separate from strategy/backtest logic.
 - Never hardcode absolute machine paths; resolve data relative to the repo root.
-- Do not commit generated artifacts or the contents of `data/`.
+- The `data/` corpus is committed and read-only; do not commit *generated*
+  artifacts (outputs, caches, downloaded extras) — add them to `.gitignore`.
 
 ## Build / test / run
 
@@ -119,4 +122,4 @@ exists, so it stays the single source of truth for how to work in the repo.
 - The `data/` corpus is large; avoid reading entire files into memory or context
   when a sample (`head`, `nrows=...`) suffices.
 - Treat market data as **read-only**; do not modify or delete files under `data/`.
-- Avoid committing anything in `data/` to git.
+  The corpus is version-controlled, so unintended edits would pollute history.
