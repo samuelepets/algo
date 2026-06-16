@@ -28,12 +28,15 @@ runnable, committable state. All code is Python, managed with uv.
 
 ## Phase 2 — Backtest harness
 
-- [ ] Define a minimal strategy interface (input: bars → output: target
-      position / signal in [-1, 1]).
-- [ ] Implement a vectorized backtester: signal → positions → returns → equity.
-- [ ] Model transaction costs (spread/slippage/fees) and position sizing.
-- [ ] Compute core metrics: total/annualized return, Sharpe, max drawdown,
-      hit rate, turnover.
+- [x] Define a minimal strategy interface (input: bars → output: target
+      position / signal in [-1, 1]). → `Strategy` protocol in `backtest.py`.
+- [x] Implement a vectorized backtester: signal → positions → returns → equity.
+      Close(t) signal, Open(t+1) execution via `signal.shift(1)` and open-to-open
+      returns. → `backtest()`.
+- [x] Model transaction costs (spread/slippage/fees) via `cost_per_turnover` on
+      position changes. Position sizing is the clipped signal in `[-1, 1]`.
+- [x] Compute core metrics: total/annualized return, Sharpe, max drawdown,
+      hit rate, turnover. → `compute_metrics()`.
 
 ## Phase 3 — Base strategies
 
