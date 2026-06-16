@@ -40,11 +40,14 @@ runnable, committable state. All code is Python, managed with uv.
 
 ## Phase 3 — Base strategies
 
-- [ ] Trend/momentum (e.g. moving-average crossover).
-- [ ] Mean-reversion (e.g. RSI or rolling z-score).
-- [ ] Breakout (e.g. Donchian channel).
-- [ ] Backtest each independently and record per-strategy metrics as the baseline
-      to beat.
+- [x] S1 — Connors RSI(2) mean-reversion with SMA(200/5) regime filter.
+      → `ConnorsRsi2` in `strategies.py`.
+- [x] S2 — Dual EMA(9/21) crossover with RSI(14) momentum filter.
+      → `EmaCrossRsi` in `strategies.py`.
+- [x] S3 — RSI(14) 50-centerline crossover with EMA(50) trend filter.
+      → `RsiCenterlineEma` in `strategies.py`.
+- [x] Backtest each independently and record per-strategy metrics as the baseline
+      to beat. → `baseline.py` (`uv run python baseline.py`).
 
 ## Phase 4 — Ensemble
 
