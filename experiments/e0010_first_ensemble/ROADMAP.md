@@ -49,7 +49,46 @@ runnable, committable state. All code is Python, managed with uv.
 - [x] Backtest each independently and record per-strategy metrics as the baseline
       to beat. → `baseline.py` (`uv run python baseline.py`).
 
-## Phase 4 — Ensemble
+## Phase 4 — Genetic algorithm parameter optimization
+
+Before combining strategies into an ensemble, tune each one independently with a
+**genetic algorithm (GA)** so the ensemble starts from stronger, data-informed
+components rather than literature defaults.
+
+- [ ] Define a **parameter search space** per strategy (S1–S3), e.g.:
+      - S1: `sma_regime`, `sma_exit`, `rsi_period`, `rsi_oversold`, `rsi_overbought`
+      - S2: `fast_period`, `slow_period`, `rsi_period`, `rsi_overbought`, `rsi_oversold`
+      - S3: `ema_period`, `rsi_period`, `centerline`
+      Document sensible min/max/step or categorical choices for each gene.
+- [ ] Implement a GA engine: population, tournament (or roulette) selection,
+      single-point / uniform crossover, bounded mutation, elitism, and a fixed
+      generation budget. Keep it dependency-light (stdlib + numpy; no heavy GA
+      frameworks unless justified).
+- [ ] **Train / search split:** optimize on a **train year** only; evaluate the
+      winning genomes on a separate **test year** (never the same year).
+      - **Fitness function (train):** run `backtest()` on `--train-year` bars
+        (default e.g. `2023`) and score each genome (e.g. Sharpe ratio, with
+        penalties for excessive turnover or max drawdown if needed). Cache fitness
+        evaluations by parameter tuple to avoid redundant backtests.
+      - **Held-out evaluation (test):** after each GA run, backtest the best
+        genome on `--test-year` (default e.g. `2024`) **without** feeding those
+        results back into selection — read-only check of generalization.
+- [ ] Optimize **each strategy separately** (three independent GA runs) and
+      persist the best genome per strategy under `outputs/` (JSON or similar:
+      parameters + train-year fitness + test-year metrics).
+- [ ] Add a runner script, e.g. `optimize.py`
+      (`uv run python optimize.py --train-year 2023 --test-year 2024`), and wire
+      optimized parameters into strategy instances (constructor overrides or a
+      small factory) so downstream steps can load them without editing source.
+- [ ] Re-run `baseline.py` with optimized parameters on the **test year** and
+      record the uplift vs. literature defaults — this becomes the new baseline to
+      beat with the ensemble.
+
+> **Note:** The test year must remain untouched during GA search. Phase 6
+> (validation) can extend this with walk-forward splits or additional held-out
+> years if needed.
+
+## Phase 5 — Ensemble
 
 - [x] Combine base signals: majority vote, averaged signal, and inverse-volatility
       weighting. → `ensemble.py`.
@@ -57,14 +96,16 @@ runnable, committable state. All code is Python, managed with uv.
       → `return_correlation_matrix()`.
 - [x] Backtest each ensemble variant; compare against individual strategies.
       → `ensemble_run.py` (`uv run python ensemble_run.py`).
+- [ ] Re-run ensembles using **GA-optimized** strategy parameters (after Phase 4)
+      and compare against both default and optimized individual baselines.
 
-## Phase 5 — Validation
+## Phase 6 — Validation
 
 - [ ] Out-of-sample / walk-forward split (train window → test window).
 - [ ] Run across the selected instruments to check robustness (not one market).
 - [ ] Basic sensitivity check on key parameters to gauge overfitting.
 
-## Phase 6 — Reporting & conclusion
+## Phase 7 — Reporting & conclusion
 
 - [ ] Generate equity-curve and metrics plots into `outputs/`.
 - [ ] Evaluate against the success criteria in `RATIONALE.md`.
