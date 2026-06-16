@@ -32,6 +32,8 @@ on top of this dataset.
 ├── AGENTS.md           # this file (canonical agent guidance)
 ├── CLAUDE.md           # imports AGENTS.md for Claude Code
 ├── .vscode/            # editor color customizations only
+├── experiments/        # isolated trading-strategy research (see below)
+│   └── <name>/         # one self-contained experiment per directory
 └── data/
     └── bars/
         └── <SYMBOL>/<SYMBOL>_<YEAR>.csv.gz
@@ -98,6 +100,19 @@ Shell (quick inspection):
 ```bash
 zcat data/bars/BTCUSD/BTCUSD_2024.csv.gz | head
 ```
+
+## Experiments
+
+`experiments/` holds isolated research, each attempting to find an **edge** with a
+different trading strategy. See [`experiments/README.md`](./experiments/README.md)
+for full conventions. The non-negotiable rules:
+
+- Each experiment is **fully self-contained** in `experiments/<name>/`.
+- The **only** shared source of information between experiments is the root
+  `data/` corpus. No cross-experiment imports, shared modules, or shared state —
+  if two experiments need the same helper, copy it into each.
+- Experiments read `data/` as read-only; generated artifacts stay inside the
+  experiment folder and are gitignored.
 
 ## Conventions for new code
 
