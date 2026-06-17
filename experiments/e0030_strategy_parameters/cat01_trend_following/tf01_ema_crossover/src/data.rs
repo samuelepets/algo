@@ -5,8 +5,24 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
-/// One OHLCV bar. `ts` is a Unix timestamp in seconds (parsed from EET,
-/// stored as-if UTC — consistent across all years for sorting/slicing).
+/// One OHLCV bar.
+///
+/// ## Timezone / timestamp policy
+/// `ts` is the bar's wall-clock label interpreted as a single, consistent
+/// **exchange clock**. The source CSVs are stamped in EET; we parse the naive
+/// `YYYY.MM.DD HH:MM:SS` label and convert it to a Unix epoch *as if it were
+/// UTC* (`NaiveDateTime::and_utc`). We deliberately do **not** apply the real
+/// EET↔UTC offset (which also carries DST transitions).
+///
+/// This is intentional and not a bug: it is an internally consistent monotonic
+/// clock. The crucial property is that walk-forward window boundaries are
+/// produced by [`year_start_ts`] using the *same* naive→UTC convention, so a
+/// bar labelled `2015.01.01 00:00:00` maps to exactly the same epoch as the
+/// `2015` boundary. IS/OOS slices therefore split on the calendar boundary the
+/// data labels imply, with **no off-by-offset drift** at the edges. The only
+/// consequence of skipping the real EET offset is that absolute epoch values
+/// are shifted by a constant (±2/3 h) versus true UTC — irrelevant for
+/// resampling, sorting, and year-aligned slicing, all of which are relative.
 #[derive(Clone, Debug)]
 pub struct Bar {
     pub ts: i64,
@@ -98,7 +114,9 @@ pub fn resample(bars: &[Bar], minutes: u32) -> Vec<Bar> {
     result
 }
 
-/// Unix timestamp of `year`-01-01 00:00:00 UTC.
+/// Epoch (seconds) of `year`-01-01 00:00:00 in the exchange clock used by
+/// [`Bar::ts`]. Uses the same naive→UTC convention as bar parsing, so window
+/// boundaries align exactly with the bar labels (see `Bar` docs for the policy).
 pub fn year_start_ts(year: i32) -> i64 {
     use chrono::NaiveDate;
     NaiveDate::from_ymd_opt(year, 1, 1)

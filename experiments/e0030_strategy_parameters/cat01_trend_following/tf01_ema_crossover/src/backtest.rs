@@ -19,7 +19,11 @@ pub struct Params {
 pub struct Metrics {
     pub sharpe: f64,
     pub profit_factor: f64,
-    pub max_drawdown: f64,  // peak-to-trough in cumulative-R space, normalised to [0,1]
+    /// Maximum peak-to-trough decline of the cumulative-R equity curve,
+    /// expressed in **absolute R units** (always ≥ 0). The equity curve starts
+    /// at 0 R, so a strategy that only loses has its peak pinned at the 0-R
+    /// starting baseline and its max drawdown equals its worst cumulative loss.
+    pub max_drawdown_r: f64,
     pub total_return: f64,  // sum of R multiples
     pub n_trades: usize,
 }
@@ -193,21 +197,27 @@ fn compute_metrics(trades: &[f64], bars: &[Bar], _params: &Params) -> Metrics {
         0.0
     };
 
-    // ── Max drawdown (cumulative R, normalised) ──────────────────────────
-    let mut cum_r = 0.0_f64;
-    let mut peak  = 0.0_f64;
+    // ── Max drawdown (absolute R units) ──────────────────────────────────
+    // Equity curve is measured in cumulative R and starts at 0. The running
+    // peak is also seeded at 0, so it represents the high-water mark relative
+    // to the initial baseline. Drawdown is `peak - cum_r` (no division), which
+    // is always ≥ 0 and avoids the divide-by-near-zero artifacts of a
+    // normalised definition. A strategy that never recovers above its starting
+    // point keeps `peak == 0`, so its max drawdown equals its deepest loss.
+    let mut cum_r  = 0.0_f64;
+    let mut peak   = 0.0_f64;
     let mut max_dd = 0.0_f64;
     for &r in trades {
         cum_r += r;
         if cum_r > peak { peak = cum_r; }
-        let dd = if peak > 0.0 { (peak - cum_r) / peak } else { 0.0 };
+        let dd = peak - cum_r;
         if dd > max_dd { max_dd = dd; }
     }
 
     Metrics {
         sharpe,
         profit_factor,
-        max_drawdown: max_dd,
+        max_drawdown_r: max_dd,
         total_return: trades.iter().sum(),
         n_trades: n,
     }

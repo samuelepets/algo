@@ -55,21 +55,28 @@
 |---|---|
 | **Sharpe Ratio** (annualised) | **−0.5631** |
 | Profit Factor | 0.9274 |
-| Max Drawdown (R-normalised) | 6.71 |
+| Max Drawdown (R, absolute) | 394.82 |
 | Total Return (R) | −335.30 |
 | Number of Trades | 8,294 |
 
-### Walk-Forward (anchored IS from 2003, 4 windows)
+> Max Drawdown is the largest peak-to-trough decline of the cumulative-R
+> equity curve in absolute R (curve starts at 0 R, value always ≥ 0).
 
-| Window | IS | OOS | IS Sharpe | OOS Sharpe | OOS PF | OOS Trades |
-|---|---|---|---|---|---|---|
-| 1 | 2003–2014 | 2015–2018 | −0.153 | **+0.092** | 1.013 | 1,397 |
-| 2 | 2003–2016 | 2017–2020 | −0.139 | −0.538 | 0.932 | 1,478 |
-| 3 | 2003–2018 | 2019–2022 | −0.089 | −1.799 | 0.795 | 1,540 |
-| 4 | 2003–2020 | 2021–2025 | −0.227 | −1.730 | 0.800 | 1,916 |
+### Walk-Forward (anchored IS from 2003, 4 windows; IS-only parameter selection)
 
-Window 1 OOS Sharpe is marginally positive (+0.09) but not meaningful in isolation.
-Windows 2–4 show strong degradation.
+Each window re-optimises the full grid on the IS slice only and evaluates the
+selected set on OOS — no full-history leakage. Selected params are logged.
+
+| Window | IS | OOS | Selected | IS Sharpe | OOS Sharpe | OOS PF | OOS Max DD (R) | OOS Trades |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 2003–2014 | 2015–2018 | 13/50, 2.5×, rr2.5, 15m | −0.133 | −0.202 | 0.974 | 71.1 | 1,426 |
+| 2 | 2003–2016 | 2017–2020 | 12/34, 2.5×, rr3.0, 15m | −0.110 | −0.700 | 0.920 | 112.7 | 1,834 |
+| 3 | 2003–2018 | 2019–2022 | 13/50, 2.5×, rr3.0, 15m | −0.089 | −1.799 | 0.795 | 194.8 | 1,540 |
+| 4 | 2003–2020 | 2021–2025 | 13/50, 2.5×, rr3.0, 15m | −0.227 | −1.730 | 0.800 | 251.0 | 1,916 |
+
+All four OOS windows are negative. Under proper IS-only selection the
+2015–2018 window is **−0.202** (not the +0.092 reported under the earlier leaky
+protocol). Windows 2–4 degrade further.
 
 ---
 

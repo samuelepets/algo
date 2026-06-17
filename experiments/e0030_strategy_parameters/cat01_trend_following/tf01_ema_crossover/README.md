@@ -8,7 +8,11 @@
 
 A fast EMA crosses above/below a slow EMA to signal a directional regime change.
 Entry is confirmed when both EMAs slope in the same direction as the cross.
-Exit on opposite crossover or ATR-based trailing stop.
+Exits, whichever triggers first: a **fixed ATR stop** set at entry
+(`entry ∓ atr_stop_mult × ATR(14)`, never moved afterward), a fixed R:R target
+(`rr_ratio ×` the stop distance), or an opposite EMA crossover (closed at bar
+close). There is no trailing-stop logic — the stop is static for the life of
+the trade. A trailing-stop variant is left for a future experiment.
 
 ## Parameter Search Space
 
@@ -25,9 +29,9 @@ Approximate valid combinations (after constraint): ~1,500.
 
 ## Expected Outputs
 
-- `outputs/results.csv` — full grid: `fast_ema, slow_ema, atr_stop_mult, rr_ratio, tf, sharpe, profit_factor, max_dd, total_return, n_trades`
+- `outputs/results.csv` — full grid: `fast_ema, slow_ema, atr_stop_mult, rr_ratio, tf_min, sharpe, profit_factor, max_drawdown_r, total_return, n_trades`
 - `outputs/top_params.json` — top-10 by Sharpe
-- `outputs/walkforward.csv` — walk-forward metrics for the top combination
+- `outputs/walkforward.csv` — per-window IS-selected params and IS/OOS metrics (`max_drawdown_r` in absolute R)
 
 ## How to Run
 
@@ -48,8 +52,10 @@ Typical runtime: **~8.5 seconds** on a modern CPU (3,150 combinations, rayon par
 | Best combo | fast=13, slow=50, atr_m=2.5, rr=3.0, tf=15min |
 | Conclusion | **No edge found** — all combinations are net losing |
 
-Walk-forward OOS Sharpe (best combo): −0.54, −1.80, −1.73 (windows 2–4).
-Window 1 (OOS 2015–2018) marginally positive at +0.09 — not robust.
+Walk-forward (IS-only parameter selection per window) OOS Sharpe:
+−0.20, −0.70, −1.80, −1.73 (windows 1–4) — all negative. The earlier
+"+0.09" on window 1 was an artifact of selecting parameters on the full
+history; honest IS-only selection removes it.
 
 **Finding:** Raw EMA crossover without additional regime/session filters
 has no statistically significant edge on EURUSD. Spread cost (0.8 pip)
