@@ -12,11 +12,19 @@ timeframe bars resampled from them (5 min, 15 min, 30 min, 1 h, 4 h, daily).
 
 ### Objectives
 
-- [ ] Survey classical intraday strategies applicable to 1-minute bars:
-  - Trend-following (moving average crossovers, breakouts, momentum).
-  - Mean-reversion (Bollinger Bands, RSI extremes, VWAP deviation).
-  - Volatility-based (ATR expansions, opening range breakout).
-  - Pattern-based (candlestick patterns, support/resistance levels).
+- [x] Survey classical intraday strategies applicable to 1-minute bars →
+  see [`CATEGORIES.md`](./CATEGORIES.md) for the exhaustive catalog (9 families,
+  34 strategy categories with hypothesis, signals, parameters, instrument
+  suitability, and a summary matrix):
+  - Trend-following (MA crossovers, momentum/ROC, breakout, Donchian, ADX filter).
+  - Mean-reversion (Bollinger Bands, RSI extremes, VWAP deviation, z-score, stochastic).
+  - Volatility-based (ATR expansion, ORB, volatility squeeze, regime filter).
+  - Pattern-based (candlestick patterns, chart patterns, S/R, FVG, order blocks).
+  - Time-based (session open/close, time-of-day, day-of-week seasonality).
+  - Statistical & quantitative (linear regression channel, Kalman filter, Hurst, ACF, pairs).
+  - Multi-timeframe (higher-TF trend + lower-TF entry, MTF confluence).
+  - Volume-based (volume spike, OBV divergence, volume-weighted filter).
+  - Machine learning–assisted (feature classification, LSTM/Transformer, RL).
 - [ ] Evaluate each strategy class for suitability across the available
   instruments (Forex, Metals, Crypto) given their differing liquidity and
   volatility profiles.
