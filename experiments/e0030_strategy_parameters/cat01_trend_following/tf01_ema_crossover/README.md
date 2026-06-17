@@ -40,7 +40,10 @@ cargo run --release
 # Run from this directory; data path ../../../../data/bars/EURUSD/ must exist.
 ```
 
-Typical runtime: **~8.5 seconds** on a modern CPU (3,150 combinations, rayon parallel).
+Typical runtime: **~12–15 seconds** end-to-end on a modern multi-core CPU
+(~3.5 s data load + full-sample grid of 3,150 combinations + per-window IS-only
+re-optimisation for the 4 walk-forward windows, all rayon-parallel). Exact
+timing depends on CPU core count and filesystem/page caching.
 
 ## Results (EURUSD 2003–2025)
 

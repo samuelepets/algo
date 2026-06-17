@@ -30,7 +30,8 @@
 
 ## Phase 5 — Parameter grid search
 - [x] 3,150 combinations (1,575 per TF); `rayon::par_iter` parallelism.
-- [x] Run time: 5-min TF 3.54s, 15-min TF 0.66s, total 8.4s.
+- [x] Full-sample grid search ~3s (5-min TF ~2.5s, 15-min TF ~0.5s); full
+      end-to-end run (load + grid + walk-forward) ~12–15s.
 - [x] `outputs/results.csv` written (3,150 rows).
 
 ## Phase 6 — Walk-forward validation

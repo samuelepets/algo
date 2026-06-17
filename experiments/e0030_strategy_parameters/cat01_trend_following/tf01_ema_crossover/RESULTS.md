@@ -18,7 +18,7 @@
 | Data range | 2003-01-02 – 2025-12-31 (≈ 23.4 years) |
 | Bar source | 1-min bars → resampled to 5-min and 15-min |
 | Total 1-min bars | 8,490,235 |
-| Implementation | Rust — `cargo run --release` ≈ 8.5 s |
+| Implementation | Rust — `cargo run --release` ≈ 12–15 s end-to-end |
 | Run date | 2026-06-17 |
 
 ---
