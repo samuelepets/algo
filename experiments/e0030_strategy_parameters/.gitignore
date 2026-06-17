@@ -1,0 +1,9 @@
+# Rust build artifacts
+target/
+**/target/
+
+# Generated outputs from parameter searches
+outputs/
+**/outputs/
+
+# Rust lock files are committed per project (do not ignore Cargo.lock)
