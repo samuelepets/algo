@@ -29,6 +29,32 @@ Approximate valid combinations (after constraint): ~1,500.
 - `outputs/top_params.json` — top-10 by Sharpe
 - `outputs/walkforward.csv` — walk-forward metrics for the top combination
 
-## Status
+## How to Run
 
-Structure defined. Implementation pending.
+```bash
+cargo run --release
+# Run from this directory; data path ../../../../data/bars/EURUSD/ must exist.
+```
+
+Typical runtime: **~8.5 seconds** on a modern CPU (3,150 combinations, rayon parallel).
+
+## Results (EURUSD 2003–2025)
+
+| Metric | Value |
+|---|---|
+| Combinations tested | 3,150 (1,575 × 5-min + 1,575 × 15-min) |
+| Valid results (≥50 trades) | 3,150 |
+| Best Sharpe (full history) | −0.5631 |
+| Best combo | fast=13, slow=50, atr_m=2.5, rr=3.0, tf=15min |
+| Conclusion | **No edge found** — all combinations are net losing |
+
+Walk-forward OOS Sharpe (best combo): −0.54, −1.80, −1.73 (windows 2–4).
+Window 1 (OOS 2015–2018) marginally positive at +0.09 — not robust.
+
+**Finding:** Raw EMA crossover without additional regime/session filters
+has no statistically significant edge on EURUSD. Spread cost (0.8 pip)
+alone does not explain the losses — the crossover signals themselves
+generate net negative returns across all parameter combinations.
+
+Recommend advancing to filtered variants (TF-05 EMA+RSI, TF-06 ADX+EMA,
+TF-07 SuperTrend) which may suppress the high rate of false crossovers.

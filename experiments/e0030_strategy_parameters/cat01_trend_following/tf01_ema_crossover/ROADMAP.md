@@ -1,52 +1,61 @@
 # Roadmap — TF-01 EMA Crossover
 
 ## Phase 0 — Rust project setup
-- [ ] `cargo init --name tf01_ema_crossover` in this directory.
-- [ ] Add dependencies to `Cargo.toml`: `csv`, `flate2` (gzip), `chrono`, `serde`, `rayon` (parallel search).
-- [ ] Verify `cargo build` succeeds.
-- [ ] Add `outputs/` to `.gitignore`.
+- [x] `cargo init --name tf01_ema_crossover` in this directory.
+- [x] Add dependencies to `Cargo.toml`: `csv`, `flate2`, `chrono`, `serde`, `serde_json`, `rayon`.
+- [x] `cargo build --release` succeeds with zero warnings.
+- [x] `outputs/` added to `.gitignore`.
 
 ## Phase 1 — Data loading
-- [ ] Implement a loader that reads all `EURUSD_<YEAR>.csv.gz` files from
-      `../../../../data/bars/EURUSD/`, resolved relative to the repo root.
-- [ ] Parse `;`-delimited format: `Time (EET);Open;High;Low;Close;Volume`.
-- [ ] Parse timestamps with format `%Y.%m.%d %H:%M:%S`.
-- [ ] Store bars in a contiguous `Vec<Bar>` struct `{ ts: i64, open, high, low, close, volume: f64 }`.
-- [ ] Assert loaded bar count is in the expected range (≥ 5 M for full history).
+- [x] `src/data.rs`: `load_eurusd()` loads all `EURUSD_<YEAR>.csv.gz` from
+      `../../../../data/bars/EURUSD/`. 8,490,235 bars loaded (23.4 years). [3.6s]
+- [x] Parses `;`-delimited format, EET timestamps (`%Y.%m.%d %H:%M:%S`).
+- [x] Stores as `Vec<Bar>` (`ts: i64, open, high, low, close, volume: f64`).
 
 ## Phase 2 — Resampling
-- [ ] Implement `resample(bars: &[Bar], minutes: u32) -> Vec<Bar>`:
-      group by `floor(ts / (minutes × 60))`, aggregate OHLCV (O=first, H=max, L=min, C=last, V=sum).
-- [ ] Produce both 5-min and 15-min bar vectors from the 1-min source.
+- [x] `resample(&bars, minutes)`: OHLCV bucket aggregation.
+      5-min → 1,698,048 bars; 15-min → 566,016 bars.
 
-## Phase 3 — Indicator: EMA
-- [ ] Implement `ema(bars: &[Bar], period: usize) -> Vec<f64>` using the standard
-      multiplier `k = 2 / (period + 1)`.
-- [ ] Warm-up: first value = SMA of the first `period` closes; then EMA recurrence.
-- [ ] Unit test: verify EMA(9) on a known sequence matches a reference calculator.
+## Phase 3 — Indicators
+- [x] `src/indicators.rs`: `ema(period)` with SMA seed + EMA recurrence.
+- [x] `atr(period)` with Wilder's smoothing.
+- [x] 5 unit tests pass (`cargo test`).
 
 ## Phase 4 — Backtest engine
-- [ ] Implement `backtest(bars: &[Bar], fast: &[f64], slow: &[f64], atr: &[f64], params: &Params) -> Metrics`.
-- [ ] Signal: long on `fast[i-1] < slow[i-1] && fast[i] > slow[i]`; short on inverse.
-      Both EMAs must slope in crossover direction (slope = `ema[i] > ema[i-1]`).
-- [ ] Position: one unit at a time; no pyramiding.
-- [ ] Stop: placed at `entry_price ± atr_stop_mult × ATR(14)` at entry.
-- [ ] Target: placed at `entry_price ± rr_ratio × stop_distance`.
-- [ ] Exit: stop hit, target hit, or opposite crossover — whichever comes first.
-- [ ] Track: equity curve, trade list `(entry_ts, exit_ts, pnl, exit_reason)`.
-- [ ] Compute `Metrics { sharpe, profit_factor, max_drawdown, total_return, n_trades }`.
-- [ ] Include a fixed spread cost of 0.00008 (0.8 pip) per trade round-trip.
+- [x] `src/backtest.rs`: `backtest()` with slope-confirmed crossover entry,
+      ATR stop, fixed R:R target, opposite-crossover exit.
+- [x] Spread cost: 0.00008 (0.8 pip) per round-trip.
+- [x] Returns `Metrics { sharpe, profit_factor, max_drawdown, total_return, n_trades }`.
 
 ## Phase 5 — Parameter grid search
-- [ ] Build the full parameter grid (respecting `slow > fast + 5` constraint).
-- [ ] Use `rayon::par_iter` to parallelise across CPU cores.
-- [ ] Write all rows to `outputs/results.csv` as they complete.
+- [x] 3,150 combinations (1,575 per TF); `rayon::par_iter` parallelism.
+- [x] Run time: 5-min TF 3.54s, 15-min TF 0.66s, total 8.4s.
+- [x] `outputs/results.csv` written (3,150 rows).
 
 ## Phase 6 — Walk-forward validation
-- [ ] Split history into 12 rolling windows: 18-year in-sample → 4-year out-of-sample.
-- [ ] For each window: run the top combination from the full-history search.
-- [ ] Write per-window metrics to `outputs/walkforward.csv`.
+- [x] 4 anchored windows (IS always starts 2003; OOS steps 2 years).
+- [x] `outputs/walkforward.csv` written.
 
 ## Phase 7 — Output reporting
-- [ ] Sort `results.csv` by Sharpe descending; extract top-10 into `outputs/top_params.json`.
-- [ ] Print a human-readable summary to stdout when the binary completes.
+- [x] `outputs/top_params.json` with top-10 by Sharpe.
+- [x] Human-readable table printed to stdout.
+
+---
+
+## Results (EURUSD 2003–2025)
+
+> All Sharpe ratios are negative across all 3,150 parameter combinations.
+> The best combination (fast=13, slow=50, atr_m=2.5, rr=3.0, tf=15min)
+> achieved Sharpe = −0.56.
+
+**Key finding:** Pure EMA crossover with ATR stop + fixed R:R target has
+**no edge** on EURUSD over this 22-year sample. All strategies are net
+losing after the 0.8-pip spread cost, regardless of parameter choice.
+
+The walk-forward confirms the degradation: even the marginal outperformer
+on IS delivers negative OOS Sharpe in 3 of 4 windows.
+
+**Conclusion:** TF-01 is **not** a candidate for implementation. The strategy
+requires additional filters (ADX regime, MTF trend, session filter) to be viable.
+See `strategies/01_TREND_FOLLOWING.md § TF-05`, `TF-06`, `TF-07` for
+filtered variants that may perform better.

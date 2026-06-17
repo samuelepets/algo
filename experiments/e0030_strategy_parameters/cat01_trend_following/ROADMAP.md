@@ -10,7 +10,7 @@ own `ROADMAP.md`.
 
 | Strategy | Ph0 Setup | Ph1 Data | Ph2 Resample | Ph3 Indicators | Ph4 Backtest | Ph5 Grid | Ph6 WalkFwd | Ph7 Output |
 |---|---|---|---|---|---|---|---|---|
-| TF-01 EMA Crossover | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| TF-01 EMA Crossover | [x] | [x] | [x] | [x] | [x] | [x] | [x] | [x] |
 | TF-02 Triple EMA | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | TF-03 MACD Crossover | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | TF-04 MACD + 200 EMA | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
