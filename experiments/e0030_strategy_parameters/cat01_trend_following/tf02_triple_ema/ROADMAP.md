@@ -5,49 +5,50 @@ Follow the Python performance playbook in
 (Performance engineering section). Phases below mirror that template.
 
 ## Phase 0 — Python project setup (uv)
-- [ ] `uv init --python 3.12` in this directory; pin Python version.
-- [ ] `uv add numpy numba polars` (core compute + columnar IO).
-- [ ] `uv add --dev pytest ruff`.
-- [ ] `.gitignore` covers `.venv/`, `.numba_cache/`, and `outputs/`.
-- [ ] Configure `pyproject.toml`: `[tool.pytest.ini_options] pythonpath=["."]`,
+- [x] `uv init --python 3.12` in this directory; pin Python version.
+- [x] `uv add numpy numba polars` (core compute + columnar IO).
+- [x] `uv add --dev pytest ruff`.
+- [x] `.gitignore` covers `.venv/`, `.numba_cache/`, and `outputs/`.
+- [x] Configure `pyproject.toml`: `[tool.pytest.ini_options] pythonpath=["."]`,
       `testpaths=["tests"]`; `[tool.ruff] target-version="py312"`.
-- [ ] Set `NUMBA_CACHE_DIR=.numba_cache` so compiled kernels persist between runs.
-- [ ] Sanity: `uv run ruff check` and `uv run pytest` succeed (empty suite ok).
-- [ ] Copy/adapt modules from [`../tf01_ema_crossover_python/`](../tf01_ema_crossover_python/)
+- [x] Set `NUMBA_CACHE_DIR=.numba_cache` so compiled kernels persist between runs.
+- [x] Sanity: `uv run ruff check` and `uv run pytest` succeed (8 tests pass).
+- [x] Copy/adapt modules from [`../tf01_ema_crossover_python/`](../tf01_ema_crossover_python/)
       (`data.py`, resampling, grid driver patterns) — never cross-import at runtime.
 
 
 ## Phase 1 — Data loading
-- [ ] Load all `EURUSD_<YEAR>.csv.gz` from `../../../../data/bars/EURUSD/`.
-- [ ] Parse ;`-delimited format with EET timestamps (`%Y.%m.%d %H:%M:%S`).
-- [ ] Return struct-of-arrays NumPy buffers (`ts: int64`, OHLCV `float64`), sorted
-      ascending, duplicates dropped. Use Polars for CSV parsing; see
-      [`../tf01_ema_crossover_python/data.py`](../tf01_ema_crossover_python/data.py).
+- [x] Load all `EURUSD_<YEAR>.csv.gz` from `../../../../data/bars/EURUSD/`.
+- [x] Parse `;`-delimited format with EET timestamps (`%Y.%m.%d %H:%M:%S`).
+- [x] Return struct-of-arrays NumPy buffers (`ts: int64`, OHLCV `float64`), sorted
+      ascending, duplicates dropped. Use Polars for CSV parsing; see `data.py`.
 
 ## Phase 2 — Resampling
-- [ ] Implement `resample(bars, minutes)` → aggregate 1-min to 5-min, 15-min.
+- [x] Implement `resample(bars, minutes)` → aggregate 1-min to 5-min, 15-min.
 
 ## Phase 3 — Indicator(s): EMA(fast), EMA(mid), EMA(slow) alignment + slope check
-- [ ] Implement each indicator as Numba `@njit` kernels over `float64` arrays.
-- [ ] Unit test against known reference values.
+- [x] Implement each indicator as Numba `@njit` kernels over `float64` arrays.
+- [x] Unit test against known reference values.
 
 ## Phase 4 — Backtest engine
-- [ ] Signal logic specific to TF-02 Triple EMA Alignment.
-- [ ] One position at a time; ATR-based stop; fixed R:R target or indicator-based exit.
-- [ ] Include spread cost: 0.00008 (0.8 pip) per round-trip.
-- [ ] Return `(sharpe, profit_factor, max_drawdown_r, total_return, n_trades)` from a
+- [x] Signal logic: bull/bear triple alignment (fast/mid/slow all ordered + positive/negative
+      slopes); pullback rejection bar entry (low≤pb_ema AND close>pb_ema for longs; reversed
+      for shorts); exit on ATR stop, 2:1 R:R target, or alignment break.
+- [x] One position at a time; ATR-based stop; fixed 2:1 R:R target.
+- [x] Include spread cost: 0.00008 (0.8 pip) per round-trip.
+- [x] Return `(sharpe, profit_factor, max_drawdown_r, total_return, n_trades)` from
       Numba `@njit(cache=True)` `backtest_core(...)`.
 
 ## Phase 5 — Parameter grid search
-- [ ] Build full parameter grid from `README.md` search space.
-- [ ] Parallelise grid search with `@njit(parallel=True)` and `numba.prange`.
-- [ ] Write all rows to `outputs/results.csv`.
+- [x] Build full parameter grid from `README.md` search space.
+- [x] Parallelise grid search with `@njit(parallel=True)` and `numba.prange`.
+- [x] Write all rows to `outputs/results.csv`.
 
 ## Phase 6 — Walk-forward validation
-- [ ] Rolling windows: 18-year in-sample → 4-year out-of-sample.
-- [ ] Run top combination from Phase 5 on each window.
-- [ ] Write `outputs/walkforward.csv`.
+- [x] Rolling windows: 18-year in-sample → 4-year out-of-sample (same windows as tf01).
+- [x] Run top combination from Phase 5 on each window.
+- [x] Write `outputs/walkforward.csv`.
 
 ## Phase 7 — Output reporting
-- [ ] Extract top-10 by Sharpe into `outputs/top_params.json`.
-- [ ] Print summary to stdout.
+- [x] Extract top-10 by Sharpe into `outputs/top_params.json`.
+- [x] Print summary to stdout.

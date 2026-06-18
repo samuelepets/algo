@@ -32,4 +32,9 @@ Approximate valid combinations (after constraint): ~384.
 
 ## Status
 
-Structure defined. Implementation pending.
+Implementation complete. Run with:
+
+```bash
+uv sync
+uv run python main.py
+```
