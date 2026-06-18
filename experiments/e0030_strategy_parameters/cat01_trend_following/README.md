@@ -13,9 +13,12 @@ Data path: `data/bars/EURUSD/EURUSD_<YEAR>.csv.gz` (read-only).
 
 ## Method
 
-Each strategy is implemented as an independent Rust binary project. The binary:
+Each strategy is implemented as an independent **Python** project (uv-managed).
+Follow the performance playbook in
+[`tf01_ema_crossover_python/`](./tf01_ema_crossover_python/) — copy its patterns
+into each folder; never import across experiments. The driver:
 
-1. Loads and concatenates all EURUSD yearly files.
+1. Loads and concatenates all EURUSD yearly files (Polars → NumPy struct-of-arrays).
 2. Resamples 1-min bars to the strategy's target timeframe (5-min or 15-min).
 3. Iterates over the full parameter grid defined in the strategy's `README.md`.
 4. For each combination, simulates the strategy and computes:
@@ -29,19 +32,20 @@ Each strategy is implemented as an independent Rust binary project. The binary:
 6. Runs a walk-forward validation on the top combination and writes
    `outputs/walkforward.csv`.
 
-## Common Rust Project Phases
+## Common Python Project Phases
 
 All 20 sub-sub-experiments follow identical implementation phases (documented
-in each strategy's `ROADMAP.md`):
+in each strategy's `ROADMAP.md`; canonical detail in
+[`tf01_ema_crossover_python/ROADMAP.md`](./tf01_ema_crossover_python/ROADMAP.md)):
 
 | Phase | Task |
 |---|---|
-| 0 | `cargo init` — Rust project setup, `Cargo.toml` dependencies |
-| 1 | Data loading — read gzipped CSVs, parse EET timestamps |
-| 2 | Resampling — aggregate 1-min bars to target TF |
-| 3 | Indicator computation — implement the specific indicators |
-| 4 | Backtest engine — signal generation, position tracking, P&L |
-| 5 | Parameter grid search — enumerate all combinations, run backtest |
+| 0 | `uv init` — Python project setup, pinned deps, pytest + ruff |
+| 1 | Data loading — Polars CSV read → NumPy struct-of-arrays |
+| 2 | Resampling — Numba `@njit` aggregation to target TF |
+| 3 | Indicator computation — Numba kernels for strategy-specific indicators |
+| 4 | Backtest engine — Numba `@njit` signal generation, position tracking, P&L |
+| 5 | Parameter grid search — enumerate all combinations; `numba.prange` |
 | 6 | Walk-forward validation — rolling in-sample/out-of-sample windows |
 | 7 | Output reporting — write CSV/JSON results |
 
@@ -49,7 +53,7 @@ in each strategy's `ROADMAP.md`):
 
 | # | Strategy | Folder | Approx. Grid Size |
 |---|---|---|---|
-| TF-01 | EMA Crossover | `tf01_ema_crossover/` | ~1,500 |
+| TF-01 | EMA Crossover | `tf01_ema_crossover_python/` (canonical; Rust sibling `tf01_ema_crossover/`) | ~1,500 |
 | TF-02 | Triple EMA Alignment | `tf02_triple_ema/` | ~384 |
 | TF-03 | MACD Crossover | `tf03_macd_crossover/` | ~720 |
 | TF-04 | MACD + 200 EMA | `tf04_macd_200ema/` | ~648 |
@@ -73,4 +77,5 @@ in each strategy's `ROADMAP.md`):
 ## Status
 
 All 20 sub-sub-experiments have their folder structure defined.
-Implementation pending — Rust project setup will be added per strategy.
+TF-01 is complete (Python reference + legacy Rust sibling). TF-02–20: Python
+implementation pending — follow [`tf01_ema_crossover_python/`](./tf01_ema_crossover_python/).

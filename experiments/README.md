@@ -31,6 +31,13 @@ experiments/
 
 ## Conventions
 
+- **Default language:** **Python** (uv-managed). New experiments should not use
+  Rust. A few legacy Rust experiments remain for reference; do not extend that
+  stack. For compute-heavy backtests and grid searches, follow the Python
+  performance playbook in
+  [`e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/`](./e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/)
+  (Numba hot loops, Polars IO, NumPy struct-of-arrays, `prange` grid search).
+  Copy patterns into each experiment — never import across experiments.
 - **Naming:** use a short, descriptive, kebab-case name, optionally prefixed with
   a date or index (e.g. `2026-06-mean-reversion-eurusd`, `001-momentum-btc`).
 - **Read-only data:** load bars from the root `data/` directory; resolve the path

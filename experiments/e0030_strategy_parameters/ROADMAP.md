@@ -1,7 +1,9 @@
 # Roadmap — e0030_strategy_parameters
 
 Top-level progress tracker for the strategy parameter search experiment.
-Each category maps to a sub-experiment; each strategy maps to a Rust project.
+Each category maps to a sub-experiment; each strategy maps to a Python (uv) project.
+Legacy Rust in `tf01_ema_crossover/` is complete and retained for reference only.
+New strategies follow [`tf01_ema_crossover_python/`](./cat01_trend_following/tf01_ema_crossover_python/).
 
 ---
 
@@ -12,7 +14,7 @@ Sub-experiment: [`cat01_trend_following/`](./cat01_trend_following/)
 
 | Strategy | Folder | Status |
 |---|---|---|
-| TF-01 EMA Crossover | `tf01_ema_crossover/` | Structure defined |
+| TF-01 EMA Crossover | `tf01_ema_crossover/` (+ Python ref `tf01_ema_crossover_python/`) | Complete |
 | TF-02 Triple EMA | `tf02_triple_ema/` | Structure defined |
 | TF-03 MACD Crossover | `tf03_macd_crossover/` | Structure defined |
 | TF-04 MACD + 200 EMA | `tf04_macd_200ema/` | Structure defined |
@@ -87,4 +89,4 @@ Sub-experiment: `cat08_volume_based/` *(pending)*
 ## Cat 9 — Machine Learning–Assisted
 
 Strategy research: `strategies/09_ML_ASSISTED.md` *(pending)*
-Sub-experiment: `cat09_ml_assisted/` *(pending — different tech stack, not Rust)*
+Sub-experiment: `cat09_ml_assisted/` *(pending — may add ML-specific deps on top of the Python stack)*

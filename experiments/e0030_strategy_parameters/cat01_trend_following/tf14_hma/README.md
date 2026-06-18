@@ -2,7 +2,7 @@
 
 **Strategy reference:** [`strategies/01_TREND_FOLLOWING.md § TF-14`](../../../../strategies/01_TREND_FOLLOWING.md)
 **Instrument:** EURUSD 2003–2025 (1-min → 1-min and 5-min)
-**Implementation:** Rust binary (`cargo init`)
+**Implementation:** Python (uv-managed; Numba hot loops). Follow [`../tf01_ema_crossover_python/`](../tf01_ema_crossover_python/) — see its [`README.md`](../tf01_ema_crossover_python/README.md) and [`ROADMAP.md`](../tf01_ema_crossover_python/ROADMAP.md) (Performance engineering section).
 
 ## Strategy Summary
 

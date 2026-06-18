@@ -2,7 +2,8 @@
 
 **Strategy reference:** [`strategies/01_TREND_FOLLOWING.md § TF-01`](../../../../strategies/01_TREND_FOLLOWING.md)
 **Instrument:** EURUSD 2003–2025 (1-min bars → resampled to 5-min and 15-min)
-**Implementation:** Rust binary (`cargo init`)
+**Implementation:** Legacy Rust binary (historical reference). New work in this
+repo uses the Python stack — see [`../tf01_ema_crossover_python/`](../tf01_ema_crossover_python/).
 
 ## Strategy Summary
 

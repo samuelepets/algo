@@ -2,9 +2,9 @@
 
 Progress tracker for the 20 Trend-Following parameter search projects.
 
-Each row tracks a sub-sub-experiment. Phases are defined in the parent
-`e0030_strategy_parameters/README.md` and detailed in each strategy's
-own `ROADMAP.md`.
+Each row tracks a sub-sub-experiment. Phases follow the Python template in
+[`tf01_ema_crossover_python/ROADMAP.md`](./tf01_ema_crossover_python/ROADMAP.md).
+Legacy Rust in `tf01_ema_crossover/` is complete and retained for reference.
 
 ## Progress
 

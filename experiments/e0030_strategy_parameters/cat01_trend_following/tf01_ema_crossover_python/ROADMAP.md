@@ -161,8 +161,8 @@ throughput from Python. The techniques, in priority order:
   the loop, leaving only the stop/target state machine sequential) are the next
   levers.
 - If pure-Python tooling still misses the order-of-magnitude target after the
-  above, that negative result is itself the experiment's finding and should be
-  documented (it would justify keeping Rust for the heaviest kernels).
+  above, document the gap in `PERFORMANCE.md` and profile before adding complexity.
+  New experiments in this repo stay on Python; legacy Rust folders are not extended.
 
 ## Acceptance criteria
 

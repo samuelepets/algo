@@ -6,11 +6,10 @@ working in this repository. Written to follow the cross-tool
 
 ## Project overview
 
-`algo` is an early-stage repository for **algorithmic trading research and
-backtesting**. At the moment it contains only the historical market-data corpus;
-there is no application, library, build system, or test suite yet. New code
-(data loaders, indicators, strategies, backtester, etc.) is expected to be added
-on top of this dataset.
+`algo` is a repository for **algorithmic trading research and backtesting**.
+It contains a historical market-data corpus plus isolated experiments under
+`experiments/`. New code (data loaders, indicators, strategies, backtesters,
+etc.) is added on top of the dataset, one self-contained experiment at a time.
 
 - **License:** GNU GPL v2 (see `LICENSE`). Keep any new source files compatible
   with GPL-2.0.
@@ -116,12 +115,40 @@ for full conventions. The non-negotiable rules:
 
 ## Conventions for new code
 
-There is no established stack yet, so when introducing one:
+**Default language: Python.** New experiments and implementations should use
+Python with [**uv**](https://docs.astral.sh/uv/) for environment and dependency
+management (`pyproject.toml` + `uv.lock`). Do **not** start new Rust projects.
 
-- Pick the language/tooling that best fits the task and **document the chosen
-  commands here** (install, run, lint, test) so future agents can discover them.
-- For Python, prefer a virtual environment and a pinned dependency file
-  (`requirements.txt` or `pyproject.toml`).
+A small amount of **legacy Rust code** remains (e.g.
+`experiments/e0020_fast_backtester_composer/`,
+`experiments/e0030_strategy_parameters/.../tf01_ema_crossover/`). Keep it as-is
+for reference and reproducibility; do not extend or replicate the Rust stack for
+new work.
+
+### Python performance playbook (canonical reference)
+
+For compute-heavy backtests and parameter searches, follow the conventions
+validated in
+[`experiments/e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/`](./experiments/e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/):
+
+- **uv-managed** project: Python 3.12, pinned deps, `pytest` + `ruff`.
+- **Polars** for multithreaded CSV loading; hand off **struct-of-arrays NumPy
+  buffers** (`float64`/`int64`) to the compute layer — no DataFrames in hot loops.
+- **Numba `@njit`** for path-dependent backtest kernels and resampling; `cache=True`
+  and a fixed `NUMBA_CACHE_DIR`.
+- **`numba.prange`** (`parallel=True`) for embarrassingly parallel grid search.
+- **Precompute indicators once** per timeframe; slice with `np.searchsorted` for
+  walk-forward windows (no per-window recomputation).
+- Separate modules: `data.py`, `indicators.py`, `backtest.py`, `main.py`; unit
+  tests under `tests/`.
+
+See that experiment's [`README.md`](./experiments/e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/README.md),
+[`ROADMAP.md`](./experiments/e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/ROADMAP.md)
+(Performance engineering section), and [`PERFORMANCE.md`](./experiments/e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/PERFORMANCE.md).
+Copy/adapt its patterns into each new experiment — never import across experiments.
+
+General rules (all languages):
+
 - Keep the data layer separate from strategy/backtest logic.
 - Never hardcode absolute machine paths; resolve data relative to the repo root.
 - The `data/` corpus is committed and read-only; do not commit *generated*
@@ -129,8 +156,18 @@ There is no established stack yet, so when introducing one:
 
 ## Build / test / run
 
-_None defined yet._ Update this section as soon as a build, test, or run command
-exists, so it stays the single source of truth for how to work in the repo.
+Default workflow for new Python experiments (from the experiment directory):
+
+```bash
+uv sync                 # create .venv and install pinned deps
+uv run python main.py   # run the experiment entry point
+uv run pytest           # unit tests
+uv run ruff check       # lint
+```
+
+Per-experiment `README.md` files may add flags or alternate entry points. Legacy
+Rust experiments use `cargo build --release` / `cargo run --release` as documented
+in their own directories.
 
 ## Safety notes for agents
 

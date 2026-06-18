@@ -2,22 +2,24 @@
 
 **Strategy reference:** [`strategies/01_TREND_FOLLOWING.md § TF-01`](../../../../strategies/01_TREND_FOLLOWING.md)
 **Instrument:** EURUSD 2003–2025 (1-min bars → resampled to 5-min and 15-min)
-**Implementation:** Pure Python (uv-managed), JIT-compiled hot loops via Numba
-**Sibling experiment:** [`../tf01_ema_crossover`](../tf01_ema_crossover) (Rust reference)
+**Implementation:** Pure Python (uv-managed), JIT-compiled hot loops via Numba.
+**Canonical template** for all new strategy implementations in this repo.
+Legacy Rust sibling: [`../tf01_ema_crossover`](../tf01_ema_crossover) (retained
+for reference; do not replicate Rust for new strategies).
 
 ## Purpose
 
-This experiment is a **pure-Python re-implementation** of the Rust sibling
-[`tf01_ema_crossover`](../tf01_ema_crossover). It deliberately reproduces the
-*same* strategy, the *same* parameter grid, the *same* execution semantics, and
-the *same* walk-forward protocol. It is **not** a new research idea — the edge
-question was already answered by the Rust run (*no edge found*). Instead, it
-answers an **engineering** question:
+This experiment is the **canonical Python reference** for strategy parameter
+search in `e0030`. It re-implements the legacy Rust sibling
+[`tf01_ema_crossover`](../tf01_ema_crossover) with identical strategy semantics,
+parameter grid, and walk-forward protocol. The edge question was already answered
+by that run (*no edge found*); this folder documents the **engineering playbook**
+future TF-02–TF-20 (and other) implementations should copy:
 
-> Can idiomatic, well-engineered Python reach the **same order of magnitude** of
-> end-to-end runtime as the Rust implementation (~12–15 s), so that future
-> experiments in this repo can stay in Python without paying a 100×+ speed
-> penalty for the convenience?
+> Use idiomatic, well-engineered Python (Polars IO, Numba hot loops, NumPy
+> struct-of-arrays, `prange` grid search) to reach **Rust-class end-to-end
+> runtime** (~12 s measured vs. ~12–15 s Rust) without sacrificing numerical
+> fidelity.
 
 The deliverable is therefore twofold:
 

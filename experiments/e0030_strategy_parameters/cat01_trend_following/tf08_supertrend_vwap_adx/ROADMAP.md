@@ -1,32 +1,46 @@
 # Roadmap — TF-08 SuperTrend + VWAP + ADX
 
-## Phase 0 — Rust project setup
-- [ ] `cargo init --name tf08_supertrend_vwap_adx` in this directory.
-- [ ] Add dependencies to `Cargo.toml`: `csv`, `flate2`, `chrono`, `serde`, `rayon`.
-- [ ] Verify `cargo build` succeeds.
-- [ ] Add `outputs/` to `.gitignore`.
+Follow the Python performance playbook in
+[`../tf01_ema_crossover_python/ROADMAP.md`](../tf01_ema_crossover_python/ROADMAP.md)
+(Performance engineering section). Phases below mirror that template.
+
+## Phase 0 — Python project setup (uv)
+- [ ] `uv init --python 3.12` in this directory; pin Python version.
+- [ ] `uv add numpy numba polars` (core compute + columnar IO).
+- [ ] `uv add --dev pytest ruff`.
+- [ ] `.gitignore` covers `.venv/`, `.numba_cache/`, and `outputs/`.
+- [ ] Configure `pyproject.toml`: `[tool.pytest.ini_options] pythonpath=["."]`,
+      `testpaths=["tests"]`; `[tool.ruff] target-version="py312"`.
+- [ ] Set `NUMBA_CACHE_DIR=.numba_cache` so compiled kernels persist between runs.
+- [ ] Sanity: `uv run ruff check` and `uv run pytest` succeed (empty suite ok).
+- [ ] Copy/adapt modules from [`../tf01_ema_crossover_python/`](../tf01_ema_crossover_python/)
+      (`data.py`, resampling, grid driver patterns) — never cross-import at runtime.
+
 
 ## Phase 1 — Data loading
 - [ ] Load all `EURUSD_<YEAR>.csv.gz` from `../../../../data/bars/EURUSD/`.
 - [ ] Parse ;`-delimited format with EET timestamps (`%Y.%m.%d %H:%M:%S`).
-- [ ] Store in contiguous `Vec<Bar>` (`ts: i64, open, high, low, close, volume: f64`).
+- [ ] Return struct-of-arrays NumPy buffers (`ts: int64`, OHLCV `float64`), sorted
+      ascending, duplicates dropped. Use Polars for CSV parsing; see
+      [`../tf01_ema_crossover_python/data.py`](../tf01_ema_crossover_python/data.py).
 
 ## Phase 2 — Resampling
 - [ ] Implement `resample(bars, minutes)` → aggregate 1-min to 5-min, 15-min.
 
 ## Phase 3 — Indicator(s): SuperTrend direction + VWAP bias + ADX strength
-- [ ] Implement each indicator as a pure function over `&[Bar]` or `&[f64]`.
+- [ ] Implement each indicator as Numba `@njit` kernels over `float64` arrays.
 - [ ] Unit test against known reference values.
 
 ## Phase 4 — Backtest engine
 - [ ] Signal logic specific to TF-08 SuperTrend + VWAP + ADX.
 - [ ] One position at a time; ATR-based stop; fixed R:R target or indicator-based exit.
 - [ ] Include spread cost: 0.00008 (0.8 pip) per round-trip.
-- [ ] Compute `Metrics { sharpe, profit_factor, max_drawdown, total_return, n_trades }`.
+- [ ] Return `(sharpe, profit_factor, max_drawdown_r, total_return, n_trades)` from a
+      Numba `@njit(cache=True)` `backtest_core(...)`.
 
 ## Phase 5 — Parameter grid search
 - [ ] Build full parameter grid from `README.md` search space.
-- [ ] Parallelise with `rayon::par_iter`.
+- [ ] Parallelise grid search with `@njit(parallel=True)` and `numba.prange`.
 - [ ] Write all rows to `outputs/results.csv`.
 
 ## Phase 6 — Walk-forward validation

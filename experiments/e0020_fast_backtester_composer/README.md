@@ -2,6 +2,11 @@
 
 High-performance **Rust** backtester for 1-minute OHLCV bars in this repository.
 
+> **Note:** This is a **legacy** experiment. New work in this repo uses **Python**
+> (see [`AGENTS.md`](../../AGENTS.md) and
+> [`e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/`](../e0030_strategy_parameters/cat01_trend_following/tf01_ema_crossover_python/)).
+> This folder is retained for reference and performance comparison only.
+
 This experiment is **self-contained** (see [`../README.md`](../README.md)). Its
 only external dependency is the root [`data/`](../../data) corpus, which is
 **read-only**.

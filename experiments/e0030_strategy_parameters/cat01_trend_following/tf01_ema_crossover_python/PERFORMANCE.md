@@ -67,5 +67,6 @@ Sharpe = −0.5631, 8,294 trades.
 The Python playbook documented in [`ROADMAP.md`](./ROADMAP.md) is validated on
 real data: **idiomatic, well-engineered Python with Numba reaches Rust-class
 throughput** for this event-driven backtest + embarrassingly parallel grid search.
-Future experiments in this repo can stay in Python for workloads of this shape
-without a mandatory Rust rewrite.
+This experiment is now the **canonical template** for new implementations in the
+repo (see [`AGENTS.md`](../../../../../AGENTS.md)); legacy Rust folders are retained
+for reference only.
