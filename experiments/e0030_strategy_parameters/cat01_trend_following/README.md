@@ -54,7 +54,7 @@ in each strategy's `ROADMAP.md`; canonical detail in
 | # | Strategy | Folder | Approx. Grid Size |
 |---|---|---|---|
 | TF-01 | EMA Crossover | `tf01_ema_crossover_python/` (canonical; Rust sibling `tf01_ema_crossover/`) | ~1,500 |
-| TF-02 | Triple EMA Alignment | `tf02_triple_ema/` | ~384 |
+| TF-02 | Triple EMA Alignment | `tf02_triple_ema/` | 720 |
 | TF-03 | MACD Crossover | `tf03_macd_crossover/` | ~720 |
 | TF-04 | MACD + 200 EMA | `tf04_macd_200ema/` | ~648 |
 | TF-05 | EMA + RSI | `tf05_ema_rsi/` | ~1,536 |
@@ -77,5 +77,6 @@ in each strategy's `ROADMAP.md`; canonical detail in
 ## Status
 
 All 20 sub-sub-experiments have their folder structure defined.
-TF-01 is complete (Python reference + legacy Rust sibling). TF-02–20: Python
-implementation pending — follow [`tf01_ema_crossover_python/`](./tf01_ema_crossover_python/).
+TF-01 is complete (Python reference + legacy Rust sibling). TF-02 is complete
+(Python). TF-03–20: Python implementation pending — follow
+[`tf01_ema_crossover_python/`](./tf01_ema_crossover_python/).

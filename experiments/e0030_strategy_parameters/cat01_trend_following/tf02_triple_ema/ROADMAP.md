@@ -12,7 +12,7 @@ Follow the Python performance playbook in
 - [x] Configure `pyproject.toml`: `[tool.pytest.ini_options] pythonpath=["."]`,
       `testpaths=["tests"]`; `[tool.ruff] target-version="py312"`.
 - [x] Set `NUMBA_CACHE_DIR=.numba_cache` so compiled kernels persist between runs.
-- [x] Sanity: `uv run ruff check` and `uv run pytest` succeed (8 tests pass).
+- [x] Sanity: `uv run ruff check` and `uv run pytest` succeed (11 tests pass).
 - [x] Copy/adapt modules from [`../tf01_ema_crossover_python/`](../tf01_ema_crossover_python/)
       (`data.py`, resampling, grid driver patterns) — never cross-import at runtime.
 
@@ -40,15 +40,16 @@ Follow the Python performance playbook in
       Numba `@njit(cache=True)` `backtest_core(...)`.
 
 ## Phase 5 — Parameter grid search
-- [x] Build full parameter grid from `README.md` search space.
+- [x] Build full parameter grid from `README.md` search space (720 combinations).
 - [x] Parallelise grid search with `@njit(parallel=True)` and `numba.prange`.
 - [x] Write all rows to `outputs/results.csv`.
 
 ## Phase 6 — Walk-forward validation
-- [x] Rolling windows: 18-year in-sample → 4-year out-of-sample (same windows as tf01).
-- [x] Run top combination from Phase 5 on each window.
+- [x] Anchored windows from 2003: 12-year IS → 4-year OOS (same 4 windows as tf01).
+- [x] IS-only grid re-optimisation per window; selected params evaluated on OOS.
 - [x] Write `outputs/walkforward.csv`.
 
 ## Phase 7 — Output reporting
 - [x] Extract top-10 by Sharpe into `outputs/top_params.json`.
 - [x] Print summary to stdout.
+- [x] Write [`RESULTS.md`](./RESULTS.md) and [`PERFORMANCE.md`](./PERFORMANCE.md).

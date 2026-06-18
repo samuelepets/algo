@@ -15,7 +15,7 @@ Sub-experiment: [`cat01_trend_following/`](./cat01_trend_following/)
 | Strategy | Folder | Status |
 |---|---|---|
 | TF-01 EMA Crossover | `tf01_ema_crossover/` (+ Python ref `tf01_ema_crossover_python/`) | Complete |
-| TF-02 Triple EMA | `tf02_triple_ema/` | Structure defined |
+| TF-02 Triple EMA | `tf02_triple_ema/` | Complete |
 | TF-03 MACD Crossover | `tf03_macd_crossover/` | Structure defined |
 | TF-04 MACD + 200 EMA | `tf04_macd_200ema/` | Structure defined |
 | TF-05 EMA + RSI | `tf05_ema_rsi/` | Structure defined |

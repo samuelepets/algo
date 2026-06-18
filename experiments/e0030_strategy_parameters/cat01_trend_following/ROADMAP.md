@@ -11,7 +11,7 @@ Legacy Rust in `tf01_ema_crossover/` is complete and retained for reference.
 | Strategy | Ph0 Setup | Ph1 Data | Ph2 Resample | Ph3 Indicators | Ph4 Backtest | Ph5 Grid | Ph6 WalkFwd | Ph7 Output |
 |---|---|---|---|---|---|---|---|---|
 | TF-01 EMA Crossover | [x] | [x] | [x] | [x] | [x] | [x] | [x] | [x] |
-| TF-02 Triple EMA | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| TF-02 Triple EMA | [x] | [x] | [x] | [x] | [x] | [x] | [x] | [x] |
 | TF-03 MACD Crossover | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | TF-04 MACD + 200 EMA | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
 | TF-05 EMA + RSI | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
