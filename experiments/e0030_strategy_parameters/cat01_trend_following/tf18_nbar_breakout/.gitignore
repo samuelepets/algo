@@ -1,0 +1,5 @@
+.venv/
+.numba_cache/
+outputs/
+__pycache__/
+*.pyc
