@@ -64,9 +64,23 @@ Data path `../../../../data/bars/EURUSD/` must exist (read-only corpus). The fir
 invocation pays a one-time Numba JIT compilation cost; compiled kernels are cached
 on disk (`NUMBA_CACHE_DIR=.numba_cache`) so subsequent runs skip it.
 
+## Performance (2026-06-22 run)
+
+| Phase | Time |
+|---|---|
+| **End-to-end** | **118 s** (sequential grid — parallel search OOM on 1-min bars) |
+
+> `uv run python main.py` crashes (exit 138) during the 1-min parallel grid; the
+> validation run used sequential `_eval_single` over all 1,536 combinations plus
+> walk-forward. Re-run with a sequential driver if needed.
+
+## Expected Result (research)
+
+**No edge found on full history** — all 1,536 combinations are net-losing. Best
+Sharpe −4.00. All four walk-forward OOS windows are negative. See
+[`RESULTS.md`](./RESULTS.md) for the full analysis.
+
 ## Status
 
-Code complete: `data.py`, `indicators.py`, `backtest.py`, `main.py` and unit tests
-implemented following the TF-02 Python template. `uv run ruff check` and
-`uv run pytest` pass. The full-history parameter search (`uv run python main.py`,
-which writes `outputs/`) has not yet been run — pending.
+Complete. Run date: 2026-06-22. `uv run pytest` and `uv run ruff check` pass.
+Full-history parameter search completed; outputs in `outputs/` (gitignored).
