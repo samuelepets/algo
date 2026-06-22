@@ -79,16 +79,31 @@ Same backtester conventions as the rest of the family (one position at a time, e
 
 ---
 
+## Research Caveat (indicator-as-stop family)
+
+Full-history Sharpe and profit factor values in this run are **not credible for
+deployment**. When the trailing stop is the SuperTrend line, initial risk
+`R = |entry − line|` can be vanishingly small on many entries, inflating
+R-normalised P&L and annualised Sharpe (values ≫ 1 are a red flag on 23 years of
+EURUSD). Treat these outputs as a **smoke test that the engine runs**, not evidence
+of edge. An engine audit (minimum-R floor, stop/entry sequencing) is required before
+any cross-strategy comparison.
+
+---
+
 ## Key Finding
 
-**Mixed:** 615/810 Sharpe > 0. 4 of 4 oos windows positive.
+**Engine metrics not trustworthy.** The grid reports 615/810 combos with Sharpe > 0,
+but the magnitude (best Sharpe 10.15) indicates R-normalisation artifacts, not a
+real edge. Do not compare these numbers to TF-01..TF-06.
 
 - 615 / 810 combinations with Sharpe > 0
 - 615 / 810 combinations with Profit Factor > 1.0
 - Best Sharpe: 10.1530 (atr_period=5, multiplier=1.5, htf_filter=none, atr_target=2.0, tf_min=5)
 - Worst Sharpe: -34.1952 (atr_period=10, multiplier=1.5, htf_filter=none, atr_target=1.0, tf_min=1)
 
-Compared to TF-02 (best Sharpe -0.17), this strategy is **less bad** on EURUSD full history (best Sharpe 10.1530).
+Compared to TF-02 (best Sharpe −0.17), **do not interpret TF-07 Sharpe values as
+comparable** until the indicator-as-stop P&L normalisation is fixed.
 
 ---
 
@@ -103,7 +118,8 @@ Compared to TF-02 (best Sharpe -0.17), this strategy is **less bad** on EURUSD f
 
 ## Recommendation
 
-**Do not implement TF-07 standalone.** No expectancy edge on EURUSD under this grid.
+**Do not implement TF-07 standalone.** Pending backtest engine audit for
+indicator-as-stop R normalisation before any research conclusions.
 
 ---
 

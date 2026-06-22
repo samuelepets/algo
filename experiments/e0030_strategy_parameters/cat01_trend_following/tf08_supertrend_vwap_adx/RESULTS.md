@@ -83,16 +83,27 @@ Same backtester conventions as the rest of the family (one position at a time, e
 
 ---
 
+## Research Caveat (indicator-as-stop family)
+
+Full-history Sharpe and profit factor values are **not credible for deployment**.
+SuperTrend-as-stop with `R = |entry − line|` can be near-zero, inflating R-normalised
+metrics (best Sharpe 15.17 and PF 1.90 are not plausible on 23 years of EURUSD).
+Treat as engine smoke test only; audit required before cross-strategy comparison.
+
+---
+
 ## Key Finding
 
-**Mixed:** 1704/1728 Sharpe > 0. 4 of 4 oos windows positive.
+**Engine metrics not trustworthy.** 1704/1728 combos report Sharpe > 0, but magnitudes
+indicate R-normalisation artifacts, not real edge.
 
 - 1704 / 1728 combinations with Sharpe > 0
 - 1704 / 1728 combinations with Profit Factor > 1.0
 - Best Sharpe: 15.1705 (st_atr=7, st_mult=3.5, adx_period=10, adx_threshold=20, trend_ema=21, atr_target=2.5, tf_min=5)
 - Worst Sharpe: -0.1422 (st_atr=10, st_mult=2.5, adx_period=14, adx_threshold=30, trend_ema=50, atr_target=2.5, tf_min=5)
 
-Compared to TF-02 (best Sharpe -0.17), this strategy is **less bad** on EURUSD full history (best Sharpe 15.1705).
+Compared to TF-02 (best Sharpe −0.17), **do not interpret TF-08 Sharpe values as
+comparable** until indicator-as-stop P&L normalisation is fixed.
 
 ---
 
@@ -107,7 +118,8 @@ Compared to TF-02 (best Sharpe -0.17), this strategy is **less bad** on EURUSD f
 
 ## Recommendation
 
-**Do not implement TF-08 standalone.** No expectancy edge on EURUSD under this grid.
+**Do not implement TF-08 standalone.** Pending backtest engine audit for
+indicator-as-stop R normalisation.
 
 ---
 

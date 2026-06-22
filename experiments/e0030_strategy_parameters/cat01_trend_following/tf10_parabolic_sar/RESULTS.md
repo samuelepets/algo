@@ -79,16 +79,26 @@ Same backtester conventions as the rest of the family (entries at bar close, sto
 
 ---
 
+## Research Caveat (indicator-as-stop family)
+
+Full-history Sharpe and profit factor values are **not credible for deployment**.
+SAR-as-stop with `R = |entry − SAR|` can be near-zero, producing implausible metrics
+(best Sharpe 35.32, PF 60.33 on 56k trades). Treat as engine smoke test only.
+
+---
+
 ## Key Finding
 
-**Mixed:** 192/192 Sharpe > 0. 4 of 4 oos windows positive.
+**Engine metrics not trustworthy.** All 192 combos report Sharpe > 0 with magnitudes
+that indicate R-normalisation artifacts, not real edge.
 
 - 192 / 192 combinations with Sharpe > 0
 - 192 / 192 combinations with Profit Factor > 1.0
 - Best Sharpe: 35.3237 (af_start=0.01, af_step=0.03, af_max=0.30, mode=exit_only, tf_min=5)
 - Worst Sharpe: 4.3670 (af_start=0.01, af_step=0.03, af_max=0.10, mode=standalone, tf_min=15)
 
-Compared to TF-02 (best Sharpe -0.17), this strategy is **less bad** on EURUSD full history (best Sharpe 35.3237).
+Compared to TF-02 (best Sharpe −0.17), **do not interpret TF-10 Sharpe values as
+comparable** until SAR-as-stop P&L normalisation is fixed.
 
 ---
 
@@ -103,7 +113,8 @@ Compared to TF-02 (best Sharpe -0.17), this strategy is **less bad** on EURUSD f
 
 ## Recommendation
 
-**Do not implement TF-10 standalone.** No expectancy edge on EURUSD under this grid.
+**Do not implement TF-10 standalone.** Pending backtest engine audit for
+SAR-as-stop R normalisation.
 
 ---
 
