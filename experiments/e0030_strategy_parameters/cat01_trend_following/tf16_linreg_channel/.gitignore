@@ -1,5 +1,6 @@
 .venv/
 .numba_cache/
 outputs/
+outputs_run*.log
 __pycache__/
 *.pyc
