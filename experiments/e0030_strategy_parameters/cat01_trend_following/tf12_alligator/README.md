@@ -16,6 +16,25 @@ Jaw (all fanning up) and price is above all lines, enter long on the awakening.
 - **Teeth:** SMMA(teeth_period) shifted `teeth_shift` bars forward
 - **Lips:** SMMA(lips_period) shifted `lips_shift` bars forward
 
+## Implementation Semantics
+
+Same backtester conventions as the rest of the family (entries at bar close, stop
+checked first intrabar, P&L in R units, spread `0.00008`). SMMA lines are computed
+on the **median price** `(high + low) / 2` and shifted forward.
+
+| Spec (strategies doc) | This implementation |
+|---|---|
+| Lines | `Jaw = SMMA(13·s)` shift `8·s`; `Teeth = SMMA(8·s)` shift `5·s`; `Lips = SMMA(5·s)` shift `3·s` (`s` = scale factor, values rounded) |
+| Long entry | Lips crosses above Teeth AND Teeth > Jaw AND `close > Lips` (alligator awakens, fanned up); short reversed |
+| ATR stop | Static intrabar stop at `entry ∓ atr_stop_mult × ATR(14)` |
+| Target | Fixed 2:1 reward-to-risk (`RR_RATIO = 2.0`) |
+| Exit | Stop, target, or an opposite Lips/Teeth cross (alligator falling asleep) |
+
+This experiment implements the **scale-factor** parametrisation that the spec
+recommends as the practical approach ("fix the ratios and search over a global
+scaling factor"). Valid combinations: **30** (15 per timeframe). The alternative
+raw period/shift grid (the `~150` figure) is not enumerated. Min trades: `≥ 50`.
+
 ## Parameter Search Space
 
 A global scale factor is applied to the canonical Fibonacci set
@@ -44,6 +63,25 @@ Approximate total: ~150.
 - `outputs/top_params.json`
 - `outputs/walkforward.csv`
 
+## How to Run
+
+```bash
+# From this directory. Requires uv (https://docs.astral.sh/uv/).
+uv sync                 # create .venv and install pinned deps
+uv run python main.py   # full run: load + grid + walk-forward
+
+# Tooling
+uv run pytest           # unit tests
+uv run ruff check       # lint
+```
+
+Data path `../../../../data/bars/EURUSD/` must exist (read-only corpus). The first
+invocation pays a one-time Numba JIT compilation cost; compiled kernels are cached
+on disk (`NUMBA_CACHE_DIR=.numba_cache`) so subsequent runs skip it.
+
 ## Status
 
-Structure defined. Implementation pending.
+Code complete: `data.py`, `indicators.py`, `backtest.py`, `main.py` and unit tests
+implemented following the TF-02 Python template. `uv run ruff check` and
+`uv run pytest` pass. The full-history parameter search (`uv run python main.py`,
+which writes `outputs/`) has not yet been run — pending.

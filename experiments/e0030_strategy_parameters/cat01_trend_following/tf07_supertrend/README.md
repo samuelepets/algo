@@ -22,6 +22,30 @@ SuperTrend = upper_band when bullish; lower_band when bearish
 Flip to bullish: `close[i] > lower_band[i-1]`
 Flip to bearish: `close[i] < upper_band[i-1]`
 
+## Implementation Semantics
+
+Same backtester conventions as the rest of the family (one position at a time,
+entries at bar close, stop checked before target intrabar, P&L in R units, spread
+`0.00008`). SuperTrend belongs to the family whose **stop is the indicator itself**.
+
+| Spec (strategies doc) | This implementation |
+|---|---|
+| Entry | On a SuperTrend flip (red→green long, green→red short) at the bar close |
+| Trailing stop | The SuperTrend line, re-read each bar; intrabar exit when price touches it |
+| Initial risk (R) | `|entry − SuperTrend line at entry|` (used to normalise P&L) |
+| Target | `entry ± atr_target × ATR(atr_period)` (fixed ATR-multiple profit exit) |
+| `htf_filter` | EMA(200) trend of the **last completed** higher-TF bar (15-min or 1 h), base-aligned; longs require the htf trend to be up, shorts down. `none` disables it |
+| Exit | Stop touched, target reached, or a SuperTrend flip to the opposite side |
+
+The SuperTrend is recomputed inside the Numba kernel from a per-`atr_period` ATR
+cache (5 arrays) rather than materialising one array per grid cell — this keeps
+the 1-min run (8.5 M bars × 810 cells) memory-light. Valid combinations: **810**
+(270 per timeframe). Min trades filter: `≥ 50`.
+
+> Note: the indicator block above quotes the spec's band labels verbatim; the code
+> uses the conventional definition (`lower = HL2 − mult·ATR` as support in uptrends,
+> `upper = HL2 + mult·ATR` as resistance in downtrends).
+
 ## Parameter Search Space
 
 ```
@@ -40,6 +64,25 @@ Approximate combinations: ~810.
 - `outputs/top_params.json`
 - `outputs/walkforward.csv`
 
+## How to Run
+
+```bash
+# From this directory. Requires uv (https://docs.astral.sh/uv/).
+uv sync                 # create .venv and install pinned deps
+uv run python main.py   # full run: load + grid + walk-forward
+
+# Tooling
+uv run pytest           # unit tests
+uv run ruff check       # lint
+```
+
+Data path `../../../../data/bars/EURUSD/` must exist (read-only corpus). The first
+invocation pays a one-time Numba JIT compilation cost; compiled kernels are cached
+on disk (`NUMBA_CACHE_DIR=.numba_cache`) so subsequent runs skip it.
+
 ## Status
 
-Structure defined. Implementation pending.
+Code complete: `data.py`, `indicators.py`, `backtest.py`, `main.py` and unit tests
+implemented following the TF-02 Python template. `uv run ruff check` and
+`uv run pytest` pass. The full-history parameter search (`uv run python main.py`,
+which writes `outputs/`) has not yet been run — pending.

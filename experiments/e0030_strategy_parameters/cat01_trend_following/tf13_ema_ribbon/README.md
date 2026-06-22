@@ -14,6 +14,23 @@ strong trend. Entry on pullback to the fastest EMA.
 
 `alignment = count of consecutive in-order pairs / (N-1)` — must meet threshold.
 
+## Implementation Semantics
+
+Same backtester conventions as the rest of the family (entries at bar close, stop
+checked first intrabar, P&L in R units, spread `0.00008`).
+
+| Spec (strategies doc) | This implementation |
+|---|---|
+| Ribbon periods | `round(ema_start · ema_ratio**k)` for `k = 0…count−1`, forced strictly increasing |
+| Alignment | Fraction of adjacent pairs in order (bull: faster > slower) ≥ `alignment_pct` |
+| Expansion | Fast−slow spacing wider than `expansion_bars` ago (bull) |
+| Long entry | Aligned + expanding + pullback to fastest EMA (`low ≤ fastEMA` and `close > fastEMA`); short reversed |
+| Stop | Fixed `entry ∓ 1.5 × ATR(14)` (this grid has no ATR-stop parameter) |
+| Target | Fixed 2:1 reward-to-risk (`RR_RATIO = 2.0`) |
+| Exit | Stop, target, or loss of ribbon alignment (spacing crosses zero) |
+
+Valid combinations: **486** (243 per timeframe). Min trades filter: `≥ 50`.
+
 ## Parameter Search Space
 
 ```
@@ -33,6 +50,25 @@ Approximate combinations: ~486.
 - `outputs/top_params.json`
 - `outputs/walkforward.csv`
 
+## How to Run
+
+```bash
+# From this directory. Requires uv (https://docs.astral.sh/uv/).
+uv sync                 # create .venv and install pinned deps
+uv run python main.py   # full run: load + grid + walk-forward
+
+# Tooling
+uv run pytest           # unit tests
+uv run ruff check       # lint
+```
+
+Data path `../../../../data/bars/EURUSD/` must exist (read-only corpus). The first
+invocation pays a one-time Numba JIT compilation cost; compiled kernels are cached
+on disk (`NUMBA_CACHE_DIR=.numba_cache`) so subsequent runs skip it.
+
 ## Status
 
-Structure defined. Implementation pending.
+Code complete: `data.py`, `indicators.py`, `backtest.py`, `main.py` and unit tests
+implemented following the TF-02 Python template. `uv run ruff check` and
+`uv run pytest` pass. The full-history parameter search (`uv run python main.py`,
+which writes `outputs/`) has not yet been run — pending.

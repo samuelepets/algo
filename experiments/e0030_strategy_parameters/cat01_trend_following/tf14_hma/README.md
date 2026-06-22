@@ -17,6 +17,24 @@ WMA(values, period) = Σ(w_i × v_i) / Σ(w_i)  where w_i = i (linear weights)
 HMA(n) = WMA(2×WMA(n/2) − WMA(n),  floor(sqrt(n)))
 ```
 
+## Implementation Semantics
+
+Same backtester conventions as the rest of the family (entries at bar close, stop
+checked first intrabar, P&L in R units, spread `0.00008`). The smoothing length uses
+`round(sqrt(n))`.
+
+| Spec (strategies doc) | This implementation |
+|---|---|
+| `mode = slope` | Long when HMA(fast) rises for `slope_bars` consecutive bars and `close > HMA`; exit when the slope turns down |
+| `mode = crossover` | Long on HMA(fast) crossing above HMA(slow); exit on the opposite cross |
+| ATR stop | Static intrabar stop at `entry ∓ atr_stop_mult × ATR(14)` |
+| Target | Fixed 2:1 reward-to-risk (`RR_RATIO = 2.0`) |
+
+The grid is **de-duplicated by mode**: `slope` ignores `hma_slow`, `crossover`
+ignores `slope_bars` and requires `hma_slow > hma_fast`. Valid combinations:
+**204** (102 per timeframe; 45 slope + 57 crossover). The `~360` figure in the stub
+counted the modes' parameters jointly. Min trades filter: `≥ 50`.
+
 ## Parameter Search Space
 
 ```
@@ -36,6 +54,25 @@ Approximate combinations: ~360 (slope mode uses only `hma_fast`; crossover uses 
 - `outputs/top_params.json`
 - `outputs/walkforward.csv`
 
+## How to Run
+
+```bash
+# From this directory. Requires uv (https://docs.astral.sh/uv/).
+uv sync                 # create .venv and install pinned deps
+uv run python main.py   # full run: load + grid + walk-forward
+
+# Tooling
+uv run pytest           # unit tests
+uv run ruff check       # lint
+```
+
+Data path `../../../../data/bars/EURUSD/` must exist (read-only corpus). The first
+invocation pays a one-time Numba JIT compilation cost; compiled kernels are cached
+on disk (`NUMBA_CACHE_DIR=.numba_cache`) so subsequent runs skip it.
+
 ## Status
 
-Structure defined. Implementation pending.
+Code complete: `data.py`, `indicators.py`, `backtest.py`, `main.py` and unit tests
+implemented following the TF-02 Python template. `uv run ruff check` and
+`uv run pytest` pass. The full-history parameter search (`uv run python main.py`,
+which writes `outputs/`) has not yet been run — pending.

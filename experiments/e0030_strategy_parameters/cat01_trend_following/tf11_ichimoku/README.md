@@ -18,6 +18,25 @@ A simplified variant uses only the TK cross direction + price vs. cloud.
 - **Senkou Span B:** `(max_high(n3) + min_low(n3)) / 2` displaced `n2` bars forward
 - **Chikou Span:** current close displaced `n2` bars backward
 
+## Implementation Semantics
+
+Same backtester conventions as the rest of the family (entries at bar close, stop
+checked first intrabar, P&L in R units, spread `0.00008`). Displacement = Kijun
+period `n2` (traditional). The Kijun-sen is the trailing stop.
+
+| Spec (strategies doc) | This implementation |
+|---|---|
+| `tk_cross` | Tenkan crosses above Kijun AND `close` above the cloud (long); reversed short |
+| `full_signal` | TK cross AND above/below cloud AND green/red cloud (Span A vs B) AND Chikou (`close > close[i−n2]`) |
+| `cloud_break` | `close` crosses outward through the cloud top (long) / bottom (short) |
+| Stop / initial risk R | The Kijun-sen; `R = |entry − Kijun at entry|` |
+| Target | Fixed 2:1 reward-to-risk (`RR_RATIO = 2.0`) |
+| Exit | Kijun touched intrabar, target reached, or an opposite TK cross |
+
+Valid combinations: **288** (144 per timeframe). The `senkou_b ≈ 2·kijun` relation
+is noted as *preferred* in the spec but **not enforced** — the full grid is searched.
+Min trades filter: `≥ 50`.
+
 ## Parameter Search Space
 
 ```
@@ -36,6 +55,25 @@ Approximate combinations: ~288 (constraint: senkou_b ≈ 2×kijun preferred).
 - `outputs/top_params.json`
 - `outputs/walkforward.csv`
 
+## How to Run
+
+```bash
+# From this directory. Requires uv (https://docs.astral.sh/uv/).
+uv sync                 # create .venv and install pinned deps
+uv run python main.py   # full run: load + grid + walk-forward
+
+# Tooling
+uv run pytest           # unit tests
+uv run ruff check       # lint
+```
+
+Data path `../../../../data/bars/EURUSD/` must exist (read-only corpus). The first
+invocation pays a one-time Numba JIT compilation cost; compiled kernels are cached
+on disk (`NUMBA_CACHE_DIR=.numba_cache`) so subsequent runs skip it.
+
 ## Status
 
-Structure defined. Implementation pending.
+Code complete: `data.py`, `indicators.py`, `backtest.py`, `main.py` and unit tests
+implemented following the TF-02 Python template. `uv run ruff check` and
+`uv run pytest` pass. The full-history parameter search (`uv run python main.py`,
+which writes `outputs/`) has not yet been run — pending.
