@@ -9,10 +9,9 @@ self-contained attempt to find an **edge** with a given strategy idea.
 - The **only** shared source of information between experiments is the root
   [`data/`](../data) corpus (read-only market data).
 - An experiment MUST NOT import from, depend on, read outputs of, or otherwise
-  reference another experiment. No cross-experiment imports, shared modules, or
+  reference another experiment. No cross-experiment imports, or
   shared state.
-- If two experiments need the same helper code, **copy it** into each experiment
-  (duplication is preferred over coupling here) or promote it to a shared library
+- If two experiments need the same helper code, **promote it** to a shared library
   *outside* `experiments/` only once it is genuinely stable and general.
 
 This isolation keeps every result independently reproducible and prevents one

@@ -108,8 +108,9 @@ for full conventions. The non-negotiable rules:
 
 - Each experiment is **fully self-contained** in `experiments/<name>/`.
 - The **only** shared source of information between experiments is the root
-  `data/` corpus. No cross-experiment imports, shared modules, or shared state —
-  if two experiments need the same helper, copy it into each.
+  `data/` corpus. No cross-experiment imports, or shared state —
+  if two experiments need the same helper, **promote it** to a shared library
+  *outside* `experiments/` only once it is genuinely stable and general.
 - Experiments read `data/` as read-only; generated artifacts stay inside the
   experiment folder and are gitignored.
 
