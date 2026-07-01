@@ -1,0 +1,22 @@
+[project]
+name = "regime-detector"
+version = "0.1.0"
+description = "EUR/USD market regime detector (Stage 1: rule-based classifier with hysteresis)"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
