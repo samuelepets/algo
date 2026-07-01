@@ -93,4 +93,5 @@ Each sub-sub-experiment writes its results to `outputs/` (gitignored):
 | Category | Status |
 |---|---|
 | Cat 1 — Trend-Following (20 strategies) | TF-01 complete (Rust + Python); TF-02 complete (Python); TF-03–20 pending |
-| Cat 2–9 | Pending strategy research documents |
+| Cat 2 — Mean-Reversion (20 strategies) | Research doc complete; MR-01 complete — no edge found; MR-02–20 pending |
+| Cat 3–9 | Strategy research documents complete; sub-experiments pending |

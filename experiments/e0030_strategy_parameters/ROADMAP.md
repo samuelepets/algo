@@ -37,10 +37,33 @@ Sub-experiment: [`cat01_trend_following/`](./cat01_trend_following/)
 
 ---
 
-## Cat 2 — Mean-Reversion
+## Cat 2 — Mean-Reversion (20 strategies)
 
-Strategy research: `strategies/02_MEAN_REVERSION.md` *(pending)*
-Sub-experiment: `cat02_mean_reversion/` *(pending)*
+Strategy research: [`strategies/02_MEAN_REVERSION.md`](../../strategies/02_MEAN_REVERSION.md)
+Sub-experiment: [`cat02_mean_reversion/`](./cat02_mean_reversion/)
+
+| Strategy | Folder | Status |
+|---|---|---|
+| MR-01 Bollinger Band Mean Reversion | `mr01_bollinger_band/` | Complete — no edge found (best Sharpe −0.15, all 4 walk-forward windows OOS-negative); see [`RESULTS.md`](./cat02_mean_reversion/mr01_bollinger_band/RESULTS.md) |
+| MR-02 RSI(2) Ultra-Short Reversion | — | Pending |
+| MR-03 VWAP Standard Deviation Bands | — | Pending |
+| MR-04 Z-Score Statistical Reversion | — | Pending |
+| MR-05 Stochastic %K/%D Reversion | — | Pending |
+| MR-06 CCI Extreme Reversion | — | Pending |
+| MR-07 Williams %R Reversion | — | Pending |
+| MR-08 Keltner Channel Reversion | — | Pending |
+| MR-09 Price/EMA Distance (Rubber Band) | — | Pending |
+| MR-10 RSI Divergence Reversion | — | Pending |
+| MR-11 Double Bollinger Band System | — | Pending |
+| MR-12 Pivot Point Reversion | — | Pending |
+| MR-13 Money Flow Index (MFI) Extremes | — | Pending |
+| MR-14 Stochastic RSI Reversion | — | Pending |
+| MR-15 DeMarker Oscillator Reversion | — | Pending |
+| MR-16 Opening Range Mean Reversion | — | Pending |
+| MR-17 EMA Touch Return | — | Pending |
+| MR-18 High-Low Channel Fade | — | Pending |
+| MR-19 Connors RSI (3-Component) Reversion | — | Pending |
+| MR-20 TEMA Distance Reversion | — | Pending |
 
 ---
 
