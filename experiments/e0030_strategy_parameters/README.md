@@ -93,5 +93,5 @@ Each sub-sub-experiment writes its results to `outputs/` (gitignored):
 | Category | Status |
 |---|---|
 | Cat 1 — Trend-Following (20 strategies) | TF-01 complete (Rust + Python); TF-02 complete (Python); TF-03–20 pending |
-| Cat 2 — Mean-Reversion (20 strategies) | Research doc complete; MR-01 complete — no edge found; MR-02–20 pending |
+| Cat 2 — Mean-Reversion (20 strategies) | Complete — all 20 strategies implemented, tested, run on EURUSD full history + walk-forward. No strategy clears the live-trading bar; 7 show a real full-history positive cluster worth follow-up (MR-19, MR-02, MR-20, MR-06, MR-08, MR-15, and the near-breakeven MR-12/MR-13). See [`ROADMAP.md`](./ROADMAP.md#cat-2--mean-reversion-20-strategies) |
 | Cat 3–9 | Strategy research documents complete; sub-experiments pending |
