@@ -1,0 +1,377 @@
+<title>Bars in, regime out</title>
+<style>
+  :root {
+    --bg: #EEF0F1;
+    --surface: #FFFFFF;
+    --ink: #1B1F24;
+    --muted: #5B6470;
+    --line: #D7DBDD;
+    --accent: #A8721F;
+    --accent-ink: #7A5416;
+    --accent-soft: #F1E4C8;
+    --shadow: 0 1px 2px rgba(27,31,36,0.06), 0 6px 16px rgba(27,31,36,0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151A;
+      --surface: #1B1F26;
+      --ink: #E6E8EA;
+      --muted: #8B93A0;
+      --line: #2B303A;
+      --accent: #D9A54B;
+      --accent-ink: #E8BE72;
+      --accent-soft: rgba(217,165,75,0.14);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151A; --surface: #1B1F26; --ink: #E6E8EA; --muted: #8B93A0;
+    --line: #2B303A; --accent: #D9A54B; --accent-ink: #E8BE72;
+    --accent-soft: rgba(217,165,75,0.14);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #EEF0F1; --surface: #FFFFFF; --ink: #1B1F24; --muted: #5B6470;
+    --line: #D7DBDD; --accent: #A8721F; --accent-ink: #7A5416;
+    --accent-soft: #F1E4C8;
+    --shadow: 0 1px 2px rgba(27,31,36,0.06), 0 6px 16px rgba(27,31,36,0.05);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.55;
+  }
+  .mono, .fn, code {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  h1, h2, h3 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    font-weight: 600;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 5rem;
+  }
+
+  .masthead { margin-bottom: 3.5rem; }
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin: 0 0 0.9rem;
+  }
+  h1 { font-size: 2.35rem; letter-spacing: -0.01em; }
+  .dek {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 56ch;
+    margin: 0.9rem 0 0;
+  }
+
+  /* ---- vertical spine ---- */
+  .chain { position: relative; }
+  .spine-label {
+    position: absolute;
+    left: -2.1rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .spine-label span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .stage-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.6rem;
+    position: relative;
+  }
+  .stage-card.small { padding: 1.25rem 1.4rem; }
+
+  .stage-num {
+    position: absolute;
+    top: -0.7rem;
+    left: 1.3rem;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+  }
+
+  .stage-kicker {
+    margin: 0 0 0.35rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .stage-card h2 { font-size: 1.25rem; }
+  .stage-card h3 { font-size: 1.05rem; }
+  .stage-card p:not(.stage-kicker) {
+    margin: 0.6rem 0 0;
+    color: var(--ink);
+    font-size: 0.95rem;
+  }
+  .stage-card.small p:not(.stage-kicker) { font-size: 0.9rem; color: var(--muted); }
+
+  .tag {
+    font-size: 0.68rem;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 0.08rem 0.4rem;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1rem; }
+  .chip {
+    font-size: 0.78rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .chip.accent { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+
+  .connector {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.9rem 0 0.9rem 0.1rem;
+    margin-left: 1.6rem;
+  }
+  .connector::before {
+    content: "";
+    width: 2px;
+    height: 1.6rem;
+    background: var(--accent);
+    opacity: 0.55;
+  }
+  .connector .fn {
+    font-size: 0.76rem;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    padding: 0.2rem 0.55rem;
+    border-radius: 5px;
+  }
+
+  /* ---- fan-out ---- */
+  .fanout { margin-top: 0; position: relative; }
+  .lead-stem {
+    width: 2px;
+    height: 2rem;
+    background: var(--accent);
+    opacity: 0.55;
+    margin: 0 auto;
+  }
+  .branches {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.6rem;
+    position: relative;
+    padding-top: 1.8rem;
+    margin-top: 0;
+  }
+  .branches::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent);
+    opacity: 0.55;
+  }
+  .branch { display: flex; flex-direction: column; align-items: stretch; }
+  .stem { width: 2px; height: 1.6rem; background: var(--accent); opacity: 0.55; margin: 0 auto; }
+  .merge-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+  }
+  .merge-row .chip { font-size: 0.68rem; padding: 0.18rem 0.45rem; }
+  .merge-row .merge-arrow { color: var(--accent-ink); font-size: 0.85rem; }
+  .arrow-down {
+    width: 2px;
+    height: 1.4rem;
+    background: var(--accent);
+    opacity: 0.55;
+    margin: 0 auto;
+  }
+  .output-card {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.74rem;
+    text-align: center;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 0.6rem 0.5rem;
+  }
+
+  footer.finding {
+    margin-top: 3.5rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid var(--line);
+  }
+  footer.finding .stage-kicker { margin-bottom: 0.5rem; }
+  footer.finding p:not(.stage-kicker) { color: var(--muted); font-size: 0.92rem; max-width: 62ch; }
+  footer.finding em { color: var(--ink); font-style: normal; font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .page { padding: 3rem 1.25rem 4rem; }
+    .spine-label { display: none; }
+    .branches { grid-template-columns: 1fr; gap: 0; }
+    .branches::before { display: none; }
+    .stem { height: 1.2rem; }
+    .branch { margin-bottom: 1.6rem; }
+    h1 { font-size: 1.9rem; }
+  }
+</style>
+
+<div class="page">
+
+  <div class="masthead">
+    <p class="eyebrow">models/fable/regime_detector</p>
+    <h1>Bars in, regime out</h1>
+    <p class="dek">How one resampled EUR/USD candle becomes a TREND/RANGE × VOL_HIGH/NORM/LOW label — and how that label is judged before anything gets to trade on it.</p>
+  </div>
+
+  <div class="chain">
+    <div class="spine-label"><span>causal — every stage reads bars ≤ t only</span></div>
+
+    <section class="stage-card">
+      <span class="stage-num">01</span>
+      <p class="stage-kicker">source corpus <span class="tag">read-only</span></p>
+      <h2 class="mono" style="font-size:1.05rem;">data/bars/&lt;SYMBOL&gt;/&lt;SYMBOL&gt;_&lt;YEAR&gt;.csv.gz</h2>
+      <p>1-minute OHLCV, semicolon-delimited, EET timestamps. Committed to the repo, never modified by anything downstream.</p>
+    </section>
+
+    <div class="connector"><span class="fn">load_minute_bars()</span></div>
+
+    <section class="stage-card">
+      <span class="stage-num">02</span>
+      <p class="stage-kicker">data.py</p>
+      <h2 class="mono" style="font-size:1.1rem;">resample_bars() / resample_h1()</h2>
+      <p>Aggregates 1-min bars to H1 (or H4). Indexed by the bar's <span class="mono">open</span> time; a separate <span class="mono">time_close</span> column marks the first instant the bar is actually safe to consume.</p>
+    </section>
+
+    <div class="connector"><span class="fn">compute_features()</span></div>
+
+    <section class="stage-card">
+      <span class="stage-num">03</span>
+      <p class="stage-kicker">features.py</p>
+      <h2>Feature matrix</h2>
+      <p>Trend strength, direction and volatility — every column expressed in ATR units, ratios or percentiles, never raw price, so thresholds hold across two decades of EUR/USD.</p>
+      <div class="chips">
+        <span class="chip mono">atr</span>
+        <span class="chip mono">adx</span>
+        <span class="chip mono">er</span>
+        <span class="chip mono">ema_fast / ema_slow</span>
+        <span class="chip mono">slope_norm</span>
+        <span class="chip mono">bb_width</span>
+        <span class="chip mono">atr_pct</span>
+      </div>
+    </section>
+
+    <div class="connector"><span class="fn">raw_signals() → confirm() → classify()</span></div>
+
+    <section class="stage-card">
+      <span class="stage-num">04</span>
+      <p class="stage-kicker">classifier.py</p>
+      <h2>Regime label, with hysteresis</h2>
+      <p>Dual enter/exit thresholds plus an N-bar confirmation delay stop the label from flapping on a single noisy bar.</p>
+      <div class="chips">
+        <span class="chip">TREND_UP</span>
+        <span class="chip">TREND_DOWN</span>
+        <span class="chip">RANGE</span>
+        <span class="chip accent">VOL_HIGH</span>
+        <span class="chip">VOL_NORM</span>
+        <span class="chip">VOL_LOW</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="fanout">
+    <div class="lead-stem"></div>
+    <div class="branches">
+
+      <div class="branch">
+        <div class="stem"></div>
+        <div class="stage-card small">
+          <p class="stage-kicker">main.py <span class="tag mono">direction + vol</span></p>
+          <h3 class="mono">evaluate.summarize()</h3>
+          <p>Labels one target year and prints the §7.1/7.2 sanity metrics: regime shares, switching rate, median duration, mean |return| trend vs. range.</p>
+        </div>
+        <div class="arrow-down"></div>
+        <div class="output-card">out/regimes_&lt;SYM&gt;_&lt;YEAR&gt;.csv</div>
+      </div>
+
+      <div class="branch">
+        <div class="stem"></div>
+        <div class="stage-card small">
+          <p class="stage-kicker">tune.py <span class="tag mono">direction only</span></p>
+          <h3 class="mono">grid search over Thresholds</h3>
+          <p>Walk-forward: rank configs on TRAIN (2003–15) under stability constraints, confirm the shortlist on VAL (2016–20), touch TEST (2021–25) exactly once.</p>
+        </div>
+        <div class="arrow-down"></div>
+        <div class="output-card">out/tuning_&lt;SYM&gt;.csv → FINAL_TH</div>
+      </div>
+
+      <div class="branch">
+        <div class="merge-row">
+          <span class="chip mono">strategies.py</span>
+          <span class="merge-arrow">→</span>
+        </div>
+        <div class="stem"></div>
+        <div class="stage-card small">
+          <p class="stage-kicker">economic.py <span class="tag mono">direction + vol</span></p>
+          <h3 class="mono">h4_regimes_on_h1()</h3>
+          <p>§7.3: does gating a toy trend-follower / mean-reverter by regime beat "always on"? Compares matched / opposite / vol_off variants.</p>
+        </div>
+        <div class="arrow-down"></div>
+        <div class="output-card">out/economic_&lt;SYM&gt;.csv</div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="finding">
+    <p class="stage-kicker">finding, as of 2026-07</p>
+    <p>The textbook routing table (trend → trend-follow, range → fade) <em>lost</em> in every period. The one variant positive on train, validation and test was inverted: Bollinger-fade enabled only during TREND regimes. See <span class="mono">README.md</span> for the full walk-forward results.</p>
+  </footer>
+
+</div>

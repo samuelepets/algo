@@ -16,10 +16,16 @@ ATR_PCT_MIN_DAYS = 30
 
 
 def _wilder(x: pd.Series, period: int) -> pd.Series:
+    """Wilder's recursive EMA (alpha=1/period): the smoothing ATR/ADX are
+    defined with, distinct from a standard span-based EMA. NaN during warmup
+    instead of a biased partial average, so callers fall through to their
+    "no signal yet" state rather than starting on a distorted read."""
     return x.ewm(alpha=1.0 / period, adjust=False, min_periods=period).mean()
 
 
 def true_range(df: pd.DataFrame) -> pd.Series:
+    """High-low range widened to include any gap from the prior close, so
+    volatility isn't understated across session/weekend gaps (routine in FX)."""
     prev_close = df["close"].shift(1)
     tr = pd.concat(
         [
@@ -33,6 +39,9 @@ def true_range(df: pd.DataFrame) -> pd.Series:
 
 
 def adx(df: pd.DataFrame, period: int = ADX_PERIOD) -> pd.Series:
+    """Average Directional Index (Wilder): trend *strength*, not direction.
+    Feeds the classifier's TREND vs RANGE gate (ADX above/below enter/exit
+    thresholds); the EMA stack decides UP vs DOWN separately."""
     up_move = df["high"].diff()
     down_move = -df["low"].diff()
     plus_dm = up_move.where((up_move > down_move) & (up_move > 0), 0.0)
@@ -45,6 +54,10 @@ def adx(df: pd.DataFrame, period: int = ADX_PERIOD) -> pd.Series:
 
 
 def efficiency_ratio(close: pd.Series, period: int = ER_PERIOD) -> pd.Series:
+    """Kaufman Efficiency Ratio: net displacement over `period` bars divided
+    by the total path traveled. Near 1 for a straight move, near 0 for chop
+    with the same net drift — catches trends that look strong on ADX alone
+    but are actually noisy."""
     net = (close - close.shift(period)).abs()
     path = close.diff().abs().rolling(period).sum()
     return net / path
